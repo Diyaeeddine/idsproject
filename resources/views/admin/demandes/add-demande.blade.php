@@ -22,7 +22,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('demande.store') }}">
+                    <form method="POST" action="{{ route('demande.store-demande') }}">
                         @csrf
                         
                         <input type="text" name="name" id="name" value='{{$user->name}}' required hidden>

@@ -38,6 +38,12 @@ public function index(Request $request)
     {
         return view('admin.profiles.add-profile');
     }
+    public function create_demande(){
+        return view('admin.demandes.add-demande');
+    }
+    public function store_demande(){
+        
+    }
 
     /**
      * Store a newly created resource in storage.

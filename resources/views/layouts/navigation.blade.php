@@ -21,8 +21,8 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" 
-                    :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('demande.add-demande')" 
+                    :active="request()->routeIs('demande.add-demande')">
                         {{ __('Création demande') }}
                     </x-nav-link>
                 </div>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link 
-                        :href="auth()->user()->role === \App\Enums\UserRole::User ? route('demande.add-demand') : route('admin.demandes')" 
+                        :href="route('admin.demandes')" 
                         :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes')">
                         {{ __('Demandes') }}
                     </x-nav-link>

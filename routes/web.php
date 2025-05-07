@@ -19,9 +19,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::view('admin/dashboard','admin.dashboard')->middleware(['auth','verified','admin'])->name('admin.dashboard');
-Route::get('user/demande/add-demand', [DemandeController::class, 'create'])->middleware(['auth','verified','user'])->name('demande.add-demand');
 Route::get('/demandes', [DemandeController::class,'create'])->middleware(['auth','verified',])->name('demandes');  
-Route::post('demande/store', [DemandeController::class, 'store'])->middleware(['auth', 'verified'])->name('demande.store');
 Route::get('admin/demandes', [DemandeController::class, 'adminIndex'])->middleware(['auth', 'verified', 'admin'])->name('admin.demandes');
 // Route::get('admin/profiles', [UserController::class, 'showUsers'])->middleware(['auth','verified', 'admin'])->name('admin.profiles');
 Route::get('admin/profile/add-profile', [UserController::class, 'create'])->middleware(['auth','verified','admin'])->name('profile.add-profile');
@@ -30,5 +28,12 @@ Route::get('admin/profiles/edit/{id}', [UserController::class, 'edit'])->middlew
 Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])->middleware(['auth','verified','admin'])->name('acce.delete');
 Route::put('profiles/update/{id}', [UserController::class, 'update'])->middleware(['auth','verified','admin'])->name('acce.update');
 Route::get('admin/profiles', [UserController::class, 'index'])->middleware(['auth','verified','admin'])->name('acce.index');
+Route::get('admin/demandes/add-demande',[DemandeController::class,'create'])->middleware(['auth','verified','admin'])->name('demande.add-demande');
+Route::post('admin/demandes/add-demande',[DemandeController::class,'store'])->middleware(['auth','verified','admin'])->name('demande.store-demande');
+// Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])->middleware(['auth', 'verified', 'admin'])->name('demande.store');
+
+##----------
+// Route::get('admin/demande/add-demand', [DemandeController::class, 'create'])->middleware(['auth','verified','admin'])->name('demande.add-demand');
+// Route::post('demande/store', [DemandeController::class, 'store'])->middleware(['auth', 'verified','admin'])->name('demande.store');
 
 require __DIR__.'/auth.php';

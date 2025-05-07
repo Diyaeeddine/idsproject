@@ -23,7 +23,7 @@ class DemandeController extends Controller
 public function create(){
 
     $users = User::all();
-    return view('user.demande.add-demand', compact('users'));
+    return view('admin.demandes.add-demande', compact('users'));
 }
     public function adminIndex(){
         
