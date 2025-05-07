@@ -6,6 +6,7 @@ use App\Models\Demande;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Enums\UserRole;
+use App\Models\ChampPersonnalise;
 
 class DemandeController extends Controller
 {
@@ -36,28 +37,31 @@ public function create(){
      */
     public function store(Request $request)
 {
-    $request->validate([
-        'name'=>['required','string','max:255'],
-        'email'=>['required','string','max:255'],
-        'typeDemande' => ['required', 'string', 'max:255'],
-        'descDemande' => ['required', 'string', 'max:255'],
-        'justDemande' => ['required', 'string', 'max:255'],
-        'duree' => ['required', 'string', 'in:temporaire,permanente', 'max:100'],
-        'urgence' => ['required', 'string', 'in:faible,moyenne,haute', 'max:100'],
+    // Créer la demande
+    $demande = Demande::create([
+        // 'titre' => $request->input('titre'), // ou autre champ que tu as dans le formulaire
+        // 'user_id' => $request->input('user_id'), // si présent
     ]);
 
-    $demande = Demande::create([
-        'name'=>$request->name,
-        'email'=>$request->email,
-        'typeDemande' => $request->typeDemande,
-        'descDemande' => $request->descDemande,
-        'justDemande' => $request->justDemande,
-        'duree' => $request->duree,
-        'urgence' => $request->urgence
-    ]);
+    // Récupérer les champs personnalisés
+    $fields = $request->input('fields', []);
+
+    foreach ($fields as $field) {
+        ChampPersonnalise::create([
+            'key' => $field['key'],
+            'value' => $field['value'],
+            'demande_id' => $demande->id, // ✅ association correcte
+        ]);
+    }
 
     return redirect()->back()->with('success', 'Demande créée avec succès');
 }
+    public function customFields()
+{
+    return $this->morphMany(CustomField::class, 'customfieldable');
+
+}
+
 
 
     /**

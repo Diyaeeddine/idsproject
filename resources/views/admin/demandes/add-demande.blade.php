@@ -22,66 +22,45 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('demande.store-demande') }}">
-                        @csrf
-                        
-                        <input type="text" name="name" id="name" value='{{$user->name}}' required hidden>
-                        <input type="text" name="email" id="email" value='{{$user->email}}' required hidden>
-                        
-                        <!-- Type de demande -->
-                        <div>
-                            <x-input-label for="typeDemande" :value="__('Type de demande')" />
-                            <x-text-input id="typeDemande" class="block mt-1 w-full" type="text" name="typeDemande" :value="old('typeDemande')" required autofocus />
-                            <x-input-error :messages="$errors->get('typeDemande')" class="mt-2" />
-                        </div>
+                    <form action="{{ route('demande.store-demande') }}" method="POST" class="space-y-4">
+    @csrf
 
-                        <!-- Description de la demande -->
-                        <div class="mt-4">
-                            <x-input-label for="descDemande" :value="__('Description de la demande')" />
-                            <textarea id="descDemande" 
-                                class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" 
-                                name="descDemande" 
-                                rows="4" 
-                                required>{{ old('descDemande') }}</textarea>
-                            <x-input-error :messages="$errors->get('descDemande')" class="mt-2" />
-                        </div>
+    <div id="custom-fields" class="space-y-2">
+        <div class="flex items-center gap-2">
+            <input type="text" name="fields[0][key]" placeholder="Nom du champ" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+            <input type="text" name="fields[0][value]" placeholder="Valeur" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+            <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
+        </div>
+    </div>
 
-                        <!-- Justification -->
-                        <div class="mt-4">
-                            <x-input-label for="justDemande" :value="__('Justification')" />
-                            <x-text-input id="justDemande" class="block mt-1 w-full" type="text" name="justDemande" :value="old('justDemande')" required />
-                            <x-input-error :messages="$errors->get('justDemande')" class="mt-2" />
-                        </div>
+    <button type="button" id="add-field" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ajouter un champ</button>
 
-                        <!-- Durée -->
-                        <div class="mt-4">
-                            <x-input-label for="duree" :value="__('Durée')" />
-                            <select id="duree" name="duree" 
-                                class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                <option value="temporaire">Temporaire</option>
-                                <option value="permanente">Permanente</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('duree')" class="mt-2" />
-                        </div>
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Envoyer</button>
+</form>
 
-                        <!-- Urgence -->
-                        <div class="mt-4">
-                            <x-input-label for="urgence" :value="__('Urgence')" />
-                            <select id="urgence" name="urgence" 
-                                class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                <option value="faible">Faible</option>
-                                <option value="moyenne">Moyenne</option>
-                                <option value="haute">Haute</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('urgence')" class="mt-2" />
-                        </div>
+<script>
+    let index = 1;
+    document.getElementById('add-field').addEventListener('click', function () {
+        const container = document.getElementById('custom-fields');
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-2";
+        div.innerHTML = `
+            <input type="text" name="fields[${index}][key]" placeholder="Nom du champ" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+            <input type="text" name="fields[${index}][value]" placeholder="Valeur" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+            <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
+        `;
+        container.appendChild(div);
+        index++;
+    });
 
-                        <div class="flex items-center justify-end mt-6">
-                            <x-primary-button class="ms-3">
-                                {{ __('Créer la demande') }}
-                            </x-primary-button>
-                        </div>
-                    </form>
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-row')) {
+            e.target.parentElement.remove();
+        }
+    });
+</script>
+
+
                 </div>
             </div>
         </div>

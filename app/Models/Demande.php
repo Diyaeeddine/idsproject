@@ -3,18 +3,15 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Http\Models\ChampsPersonnalise;
 class Demande extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'typeDemande',
-        'descDemande',
-        'justDemande',
-        'duree',
-        'urgence',
-    ];
+    protected $fillable = [];
+
+    public function champs()
+    {
+        return $this->hasMany(ChampPersonnalise::class);
+    }
 }

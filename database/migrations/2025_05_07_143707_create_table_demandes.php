@@ -9,19 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
-    {   
+    public function up(): void
+    {
         Schema::create('demandes', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->string('email');
-        $table->string('typeDemande');
-        $table->string('descDemande');
-        $table->string('justDemande');
-        $table->string('duree');
-        $table->string('urgence');
-        $table->timestamps();
-});
+            $table->id(); // crée une colonne "id" en unsignedBigInteger automatiquement
+            // $table->unsignedBigInteger('user_id')->nullable(); // si tu veux relier à un utilisateur
+            $table->timestamps();
+    });
     }
 
     /**

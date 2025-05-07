@@ -17,10 +17,8 @@ public function index(Request $request)
 {
     $query = User::query();
 
-    // Si tu veux filtrer uniquement les utilisateurs (pas les admins) :
     $query->where('role', UserRole::User);
 
-    // Recherche par nom
     if ($request->has('search') && $request->search !== null) {
         $query->where('name', 'like', '%' . $request->search . '%');
     }
