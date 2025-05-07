@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::view('admin/dashboard','admin.dashboard')->middleware(['auth','verified','admin'])->name('admin.dashboard');
-Route::get('/demandes', [DemandeController::class,'create'])->middleware(['auth','verified',])->name('demandes');  
+Route::get('/demandes', [DemandeController::class,'create'])->middleware(['auth','verified','admin'])->name('demandes');  
 Route::get('admin/demandes', [DemandeController::class, 'adminIndex'])->middleware(['auth', 'verified', 'admin'])->name('admin.demandes');
 // Route::get('admin/profiles', [UserController::class, 'showUsers'])->middleware(['auth','verified', 'admin'])->name('admin.profiles');
 Route::get('admin/profile/add-profile', [UserController::class, 'create'])->middleware(['auth','verified','admin'])->name('profile.add-profile');
@@ -30,6 +30,9 @@ Route::put('profiles/update/{id}', [UserController::class, 'update'])->middlewar
 Route::get('admin/profiles', [UserController::class, 'index'])->middleware(['auth','verified','admin'])->name('acce.index');
 Route::get('admin/demandes/add-demande',[DemandeController::class,'create'])->middleware(['auth','verified','admin'])->name('demande.add-demande');
 Route::post('admin/demandes/add-demande',[DemandeController::class,'store'])->middleware(['auth','verified','admin'])->name('demande.store-demande');
+Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])->name('demandes.affecter');
+Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUser'])->name('demandes.affecterUser');
+
 // Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])->middleware(['auth', 'verified', 'admin'])->name('demande.store');
 
 ##----------

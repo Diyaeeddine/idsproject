@@ -1,4 +1,3 @@
-<!-- resources/views/demande/add-demand.blade.php -->
 @php
     $user=auth()->user();
 @endphp

@@ -95,4 +95,23 @@ public function create(){
     {
         //
     }
+    public function affecterPage($id = null)
+{
+    $demandes = Demande::with('champs')->get(); // liste des formulaires
+    $users = User::all();
+    $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
+
+    return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
+}
+
+public function affecterUser(Request $request, $id)
+{
+    $demande = Demande::findOrFail($id);
+    $demande->user_id = $request->input('user_id');
+    $demande->save();
+    
+    
+    return redirect()->route('demandes.affecter', $id)->with('success', 'Formulaire affecté avec succès.');
+
+}
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('demandes', function (Blueprint $table) {
             $table->id(); // crée une colonne "id" en unsignedBigInteger automatiquement
-            // $table->unsignedBigInteger('user_id')->nullable(); // si tu veux relier à un utilisateur
+            $table->unsignedBigInteger('user_id')->nullable(); // si tu veux relier à un utilisateur
             $table->timestamps();
     });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down(): void    
     {
         Schema::dropIfExists('demandes');
     }
