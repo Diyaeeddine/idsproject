@@ -13,15 +13,23 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
-    public function showUsers()
+public function index(Request $request)
 {
-    $users = User::where('role', UserRole::User)->get();
+    $query = User::query();
+
+    // Si tu veux filtrer uniquement les utilisateurs (pas les admins) :
+    $query->where('role', UserRole::User);
+
+    // Recherche par nom
+    if ($request->has('search') && $request->search !== null) {
+        $query->where('name', 'like', '%' . $request->search . '%');
+    }
+
+    $users = $query->latest()->get();
+
     return view('admin.profiles.profiles', compact('users'));
 }
+
 
     /**
      * Show the form for creating a new resource.
@@ -66,22 +74,41 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user=User::find($id);
+        return view('admin.profiles.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        //
-    }
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'role' => 'required|string',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => $request->role,
+    ]);
+
+    return redirect()->route('admin.profiles')->with('success', 'Utilisateur mis à jour avec succès.');
+}
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('admin.profiles')->with('success', 'Utilisateur supprimé avec succès.');
+
     }
 }

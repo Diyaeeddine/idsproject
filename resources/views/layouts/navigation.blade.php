@@ -13,36 +13,36 @@
                         <h1 class="text-white border-solid border-white">IDS</h1>
                     </a>
                 </div>
-                                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" 
-                    :active="request()->routeIs('dashboard')">
+                    :active="request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard') }}
-                                </x-nav-link></div>
-                                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" 
                     :active="request()->routeIs('dashboard')">
                         {{ __('Création demande') }}
                     </x-nav-link>
                 </div>
-                                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" 
                     :active="request()->routeIs('dashboard')">
                         {{ __('Afféctation demande') }}
                     </x-nav-link>
                 </div>
-                <!-- Navigation Links -->
-        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-            <x-nav-link 
-                :href="auth()->user()->role === \App\Enums\UserRole::User ? route('demande.add-demand') : route('admin.demandes')" 
-                :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes')"
-            >
-                {{ __('Demandes') }}
-            </x-nav-link>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link 
+                        :href="auth()->user()->role === \App\Enums\UserRole::User ? route('demande.add-demand') : route('admin.demandes')" 
+                        :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes')">
+                        {{ __('Demandes') }}
+                    </x-nav-link>
 
             </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('admin.profiles')" 
-                    :active="request()->routeIs('admin.profiles')">
+                    <x-nav-link :href="route('acce.index')" 
+                    :active="request()->routeIs('acce.index') || request()->routeIs('acce.edit') || request()->routeIs('acce.update') || request()->routeIs('profile.add-profile')">
                         {{ __('Accés') }}
                     </x-nav-link>
                 </div>

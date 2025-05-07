@@ -23,7 +23,12 @@ Route::get('user/demande/add-demand', [DemandeController::class, 'create'])->mid
 Route::get('/demandes', [DemandeController::class,'create'])->middleware(['auth','verified',])->name('demandes');  
 Route::post('demande/store', [DemandeController::class, 'store'])->middleware(['auth', 'verified'])->name('demande.store');
 Route::get('admin/demandes', [DemandeController::class, 'adminIndex'])->middleware(['auth', 'verified', 'admin'])->name('admin.demandes');
-Route::get('admin/profiles', [UserController::class, 'showUsers'])->middleware(['auth','verified', 'admin'])->name('admin.profiles');
+// Route::get('admin/profiles', [UserController::class, 'showUsers'])->middleware(['auth','verified', 'admin'])->name('admin.profiles');
 Route::get('admin/profile/add-profile', [UserController::class, 'create'])->middleware(['auth','verified','admin'])->name('profile.add-profile');
 Route::post('admin/profile/add-profile', [UserController::class, 'store'])->middleware(['auth','verified','admin'])->name('storeProfile');
+Route::get('admin/profiles/edit/{id}', [UserController::class, 'edit'])->middleware(['auth','verified','admin'])->name('acce.edit');
+Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])->middleware(['auth','verified','admin'])->name('acce.delete');
+Route::put('profiles/update/{id}', [UserController::class, 'update'])->middleware(['auth','verified','admin'])->name('acce.update');
+Route::get('admin/profiles', [UserController::class, 'index'])->middleware(['auth','verified','admin'])->name('acce.index');
+
 require __DIR__.'/auth.php';
