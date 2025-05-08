@@ -22,20 +22,19 @@
                     @endif
 
                     <form action="{{ route('demande.store-demande') }}" method="POST" class="space-y-4">
-    @csrf
+                        @csrf
 
-    <div id="custom-fields" class="space-y-2">
-        <div class="flex items-center gap-2">
-            <input type="text" name="fields[0][key]" placeholder="Nom du champ" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
-            <input type="text" name="fields[0][value]" placeholder="Valeur" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
-            <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
-        </div>
-    </div>
+                        <div id="custom-fields" class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <label for="titre" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Titre: </label>
+                                <input type="text" name="titre" id="titre" placeholder="Titre de la demande" class="mt-1 block w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>                                <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
+                            </div>
+                        </div>
 
-    <button type="button" id="add-field" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ajouter un champ</button>
+                        <button type="button" id="add-field" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ajouter un champ</button>
 
-    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Envoyer</button>
-</form>
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Envoyer</button>
+                    </form>
 
 <script>
     let index = 1;

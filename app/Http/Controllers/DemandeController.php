@@ -37,29 +37,28 @@ public function create(){
      */
     public function store(Request $request)
 {
-    // Créer la demande
-    $demande = Demande::create([
-        // 'titre' => $request->input('titre'), // ou autre champ que tu as dans le formulaire
-        // 'user_id' => $request->input('user_id'), // si présent
+    $request->validate([
+        'titre' => 'required|string|max:255',
+        'fields' => 'array',
+        'fields.*.key' => 'required|string|max:255',
+        'fields.*.value' => 'required|string|max:255',
     ]);
 
-    // Récupérer les champs personnalisés
-    $fields = $request->input('fields', []);
+    $demande = Demande::create([
+        'titre' => $request->input('titre'),
+        'user_id' => null,
+    ]);
 
+    $fields = $request->input('fields', []);
     foreach ($fields as $field) {
         ChampPersonnalise::create([
             'key' => $field['key'],
             'value' => $field['value'],
-            'demande_id' => $demande->id, // ✅ association correcte
+            'demande_id' => $demande->id,
         ]);
     }
 
     return redirect()->back()->with('success', 'Demande créée avec succès');
-}
-    public function customFields()
-{
-    return $this->morphMany(CustomField::class, 'customfieldable');
-
 }
 
 

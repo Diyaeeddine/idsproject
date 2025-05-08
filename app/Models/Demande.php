@@ -8,7 +8,8 @@ class Demande extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ['titre', 'user_id'];
+
 
     public function champs()
     {
