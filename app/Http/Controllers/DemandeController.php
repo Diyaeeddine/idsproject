@@ -97,7 +97,7 @@ public function create(){
     public function affecterPage($id = null)
 {
     $demandes = Demande::with('champs')->get(); // liste des formulaires
-    $users = User::all();
+    $users = User::where('role', 'user')->get();
     $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
     return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
