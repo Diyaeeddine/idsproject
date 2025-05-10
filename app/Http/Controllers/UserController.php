@@ -61,7 +61,7 @@ public function index(Request $request)
         ]);
 
         event(new Registered($user));
-        return redirect()->route('admin.profiles')->with('success', 'Profil créé avec succès');
+        return redirect()->route('acce.index')->with('success', 'Profil créé avec succès');
 
     }
 
@@ -86,7 +86,7 @@ public function index(Request $request)
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-{
+{   
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $id,
@@ -100,7 +100,7 @@ public function index(Request $request)
         'role' => $request->role,
     ]);
 
-    return redirect()->route('admin.profiles')->with('success', 'Utilisateur mis à jour avec succès.');
+    return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
 }
 
 
@@ -112,7 +112,7 @@ public function index(Request $request)
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('admin.profiles')->with('success', 'Utilisateur supprimé avec succès.');
+        return redirect()->route('acce.index')->with('success', 'Utilisateur supprimé avec succès.');
 
     }
 }
