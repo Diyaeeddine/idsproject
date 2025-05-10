@@ -3,6 +3,11 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Affectation des demandes') }}
         </h2>
+        @if (session('success'))
+        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+            {{ session('success') }}
+        </div>
+    @endif
     </x-slot>
 
     <div class="py-6">
