@@ -72,7 +72,7 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
 
     // Route pour afficher les détails de la demande
 
-    Route::get('/admin/demandes/demandes/{id?}', [DemandeController::class, 'demandePage'])
+    Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');
 });
 

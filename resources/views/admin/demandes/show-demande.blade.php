@@ -18,7 +18,6 @@
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
         <div class="flex flex-col md:flex-row">
 
-          {{-- Sidebar améliorée --}}
           <aside class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r dark:border-gray-700 p-4 md:min-h-[600px]">
             <div class="flex items-center justify-between mb-4">
               <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -36,10 +35,8 @@
             
             <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
               @php
-                // Récupération rapide des demandes si la variable n'existe pas
                 $demandesList = $demandes ?? \App\Models\Demande::with('user')->latest()->get();
 
-                // Récupération de la demande sélectionnée si elle n'existe pas
                 if (!isset($selectedDemande)) {
                     $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
                     $selectedDemande = $id ? \App\Models\Demande::with('user')->find($id) : null;

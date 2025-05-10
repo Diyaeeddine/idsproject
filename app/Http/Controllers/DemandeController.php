@@ -122,7 +122,7 @@ public function store(Request $request)
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
-    $demandes = Demande::with('user')->get();
+    $demandes = Demande::with('user')->latest()->get();
 
     if ($demandes->isEmpty()) {
         abort(404, 'Aucune demande en base');
