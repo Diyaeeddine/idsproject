@@ -90,14 +90,12 @@ public function index(Request $request)
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $id,
-        'role' => 'required|string',
     ]);
 
     $user = User::findOrFail($id);
     $user->update([
         'name' => $request->name,
         'email' => $request->email,
-        'role' => $request->role,
     ]);
 
     return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
