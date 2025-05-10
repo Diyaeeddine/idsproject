@@ -16,10 +16,10 @@
                     <h1 class="text-lg font-medium mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">{{ __('Créer une demande') }}</h1>
 
                     @if (session('success'))
-                        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+                    <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
                     <form action="{{ route('demande.store-demande') }}" method="POST" class="space-y-4">
                         @csrf
