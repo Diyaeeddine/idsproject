@@ -99,38 +99,12 @@
                   <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                     <div>
                       <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {{ __('Identifiant') }}
-                      </dt>
-                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                        {{ $selectedDemande->id }}
-                      </dd>
-                    </div>
-                    
-                    <div>
-                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {{ __('Titre') }}
                       </dt>
                       <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
                         {{ $selectedDemande->titre }}
                       </dd>
                     </div>
-                    
-                    <div>
-                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {{ __('Responsable') }}
-                      </dt>
-                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 flex items-center">
-                        @if($selectedDemande->user)
-                          <span class="inline-block h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-center leading-8 mr-2 text-gray-700 dark:text-gray-300">
-                            {{ substr($selectedDemande->user->name, 0, 1) }}
-                          </span>
-                          {{ $selectedDemande->user->name }} {{ $selectedDemande->user->prenom ?? '' }}
-                        @else
-                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
-                        @endif
-                      </dd>
-                    </div>
-                    
                     <div>
                       <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {{ __('Date de création') }}
@@ -143,6 +117,25 @@
                         @endif
                       </dd>
                     </div>
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Responsable(s)') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 flex flex-col space-y-2">
+                        @forelse($selectedDemande->users as $user)
+                          <div class="flex items-center">
+                            <span class="inline-block h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-center leading-8 mr-2 text-gray-700 dark:text-gray-300">
+                              {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </span>
+                            <span>{{ $user->name }} {{ $user->prenom ?? '' }}</span>
+                          </div>
+                        @empty
+                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
+                        @endforelse
+                      </dd>
+                    </div>
+                    
+                  
 
                     {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
                   </dl>
