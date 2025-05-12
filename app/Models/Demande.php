@@ -11,7 +11,7 @@ class Demande extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['titre', 'user_id']; // Assurez-vous que 'user_id' est correct
+    protected $fillable = ['titre']; 
 
     public function champs()
     {
@@ -19,8 +19,9 @@ class Demande extends Model
     }
 
     // Ajoutez cette relation
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_id'); // Spécifiez la clé étrangère
+        return $this->belongsToMany(User::class, 'demande_user', 'demande_id', 'user_id')
+            ->withTimestamps();
     }
 }

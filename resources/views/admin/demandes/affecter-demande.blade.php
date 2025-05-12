@@ -114,25 +114,20 @@
                                             Affecter à :
                                             <div id="selectedList" class="flex flex-wrap gap-2 mt-1 mb-2"></div>
                                         </label>
-                                        <select 
-                                            onchange="addToArray(this)" 
-                                            name="user_id" 
-                                            id="user_id" 
-                                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                        >
-                                            <option value="">Sélectionner un utilisateur</option>
-                                            @foreach($users as $user)
-                                                <option value="{{ $user->id }}" {{ $selectedDemande->assigned_user_id == $user->id ? 'selected' : '' }}>
-                                                    {{ $user->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    
-                                    
+                                        <select
+                                        name="id_users[]" 
+                                        id="user_id"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                    >
+                                        <option value="">Sélectionner un utilisateur</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    </div>                                    
                                     <div class="flex justify-end">
                                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            {{ $selectedDemande->assigned_user_id ? 'Modifier l\'affectation' : 'Affecter' }}
+                                            Affecter
                                         </button>
                                     </div>
                                 </form>
@@ -151,57 +146,57 @@
             </div>
         </div>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectedUsers = new Set();
-            const selectedListElement = document.getElementById('selectedList');
-            const userSelect = document.getElementById('user_id');
+     document.addEventListener('DOMContentLoaded', function() {
+    const userSelect = document.getElementById('user_id');
+    const selectedList = document.getElementById('selectedList');
+    let selectedUsers = [];
+
+    userSelect.addEventListener('change', function() {
+        const selectedOptions = Array.from(userSelect.selectedOptions);
         
-            function addToArray(selectElement) {
-                const value = selectElement.value;
-                const name = selectElement.options[selectElement.selectedIndex].text;
-        
-                if (!value) return;
-        
-                if (selectedUsers.has(value)) {
-                    return;
-                }
-        
-                selectedUsers.add(value);
-        
-                const nameContainer = document.createElement('span');
-                nameContainer.className = 'selected-name bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm mr-2 mb-2 inline-flex items-center';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = name;
-                nameSpan.className = 'mr-2';
-                
-                const deleteButton = document.createElement('button');
-                deleteButton.innerHTML = '&times;';
-                deleteButton.className = 'text-indigo-600 hover:text-indigo-800 hover:bg-indigo-200 rounded-full w-5 h-5 flex items-center justify-center';
-                deleteButton.onclick = () => {
-                    selectedUsers.delete(value);
-                    
-                    nameContainer.remove();
-                    
-                    const option = Array.from(userSelect.options).find(opt => opt.value === value);
-                    if (option) {
-                        option.disabled = false;
-                    }
-                };
-        
-                const selectedOption = selectElement.options[selectElement.selectedIndex];
-                selectedOption.disabled = true;
-        
-                nameContainer.appendChild(nameSpan);
-                nameContainer.appendChild(deleteButton);
-                
-                selectedListElement.appendChild(nameContainer);
-        
-                selectElement.selectedIndex = 0;
+        selectedOptions.forEach(option => {
+            if (!selectedUsers.includes(option.value)) {
+                selectedUsers.push(option.value);
+                const userDiv = document.createElement('div');
+                userDiv.classList.add('inline-flex', 'items-center', 'bg-indigo-100', 'text-indigo-700', 'px-3', 'py-1', 'rounded-md', 'mr-2', 'mb-2');
+                userDiv.innerHTML = `
+                    ${option.text} 
+                    <span class="ml-2 cursor-pointer text-indigo-500" onclick="removeUser('${option.value}', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </span>
+                `;
+                selectedList.appendChild(userDiv);
             }
-        
-            window.addToArray = addToArray;
         });
-        </script>
+
+        // Désactiver les options déjà sélectionnées
+        Array.from(userSelect.options).forEach(option => {
+            option.disabled = selectedUsers.includes(option.value);
+        });
+
+        // Mettre à jour les utilisateurs sélectionnés dans un champ caché pour l'envoi
+        document.getElementById('selected_users').value = selectedUsers.join(',');
+    });
+
+    window.removeUser = function(userId, element) {
+        selectedUsers = selectedUsers.filter(id => id !== userId);
+        element.closest('div').remove();
+        
+        // Réactiver l'option dans le select
+        const option = userSelect.querySelector(`option[value="${userId}"]`);
+        if (option) {
+            option.disabled = false;
+        }
+
+        // Mettre à jour les utilisateurs sélectionnés dans le champ caché
+        document.getElementById('selected_users').value = selectedUsers.join(',');
+    };
+});
+
+    </script>
+    
 </x-app-layout>

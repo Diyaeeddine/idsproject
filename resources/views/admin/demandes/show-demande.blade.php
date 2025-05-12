@@ -35,11 +35,11 @@
             
             <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
               @php
-                $demandesList = $demandes ?? \App\Models\Demande::with('user')->latest()->get();
+                $demandesList = $demandes ?? \App\Models\Demande::with('users')->latest()->get();
 
                 if (!isset($selectedDemande)) {
                     $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
-                    $selectedDemande = $id ? \App\Models\Demande::with('user')->find($id) : null;
+                    $selectedDemande = $id ? \App\Models\Demande::with('users')->find($id) : null;
                 }
               @endphp
 

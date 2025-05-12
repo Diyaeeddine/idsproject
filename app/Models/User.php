@@ -48,4 +48,10 @@ class User extends Authenticatable
     
         'role' => UserRole::class,
     ];
+    public function demandes()
+    {
+        return $this->belongsToMany(Demande::class, 'demande_user');
+    }
+    
+
 }

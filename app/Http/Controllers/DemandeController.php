@@ -14,7 +14,7 @@ class DemandeController extends Controller
      */
     public function index()
     {
-        $demands = Demande::with('user')->latest()->get();
+        $demands = Demande::with('users')->latest()->get();
         return view('admin.demandes.show-demande', compact('demands'));
     }
 
@@ -102,25 +102,34 @@ public function store(Request $request)
     public function affecterUser(Request $request, $id)
     {
         $demande = Demande::findOrFail($id);
-        $demande->user_id = $request->input('user_id');
-        $demande->save();
-
-        return redirect()->route('demandes.affecter', $id)->with('success', 'Formulaire affecté avec succès.');
-    }
+    
+        $id_users = $request->input('id_users'); 
+        dd($id_users);
+        if (is_array($id_users) && count($id_users) > 0) {
+            $demande->users()->sync($id_users);
+        
+            return redirect()->route('demandes.affecter', $id)
+                ->with('success', 'Utilisateurs affectés avec succès à la demande.');
+        } else {
+            return redirect()->route('demandes.affecter', $id)
+                ->with('error', 'Veuillez sélectionner au moins un utilisateur.');
+        }
+    }    
+    
 
 
 
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
-    $demandes = Demande::with('user')->latest()->get();
+    $demandes = Demande::with('users')->latest()->get();
 
     if ($demandes->isEmpty()) {
         abort(404, 'Aucune demande en base');
     }
 
     $selectedDemande = $id
-        ? Demande::with('user')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
+        ? Demande::with('users')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
         : $demandes->first();
 
     if (!$selectedDemande) {

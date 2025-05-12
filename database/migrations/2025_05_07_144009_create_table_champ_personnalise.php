@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('key');
         $table->string('value');
-        $table->unsignedBigInteger('demande_id'); // clé étrangère vers la table "demandes"
+        $table->unsignedBigInteger('demande_id');
         $table->timestamps();
         $table->foreign('demande_id')->references('id')->on('demandes')->onDelete('cascade');
 
