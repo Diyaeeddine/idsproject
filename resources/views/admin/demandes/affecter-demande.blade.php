@@ -1,8 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
+        <div class='flex justify-between items-center'>
+
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Affectation des demandes') }}
         </h2>
+        <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {{ __('Retour') }}
+          </a>
+          </div>
+        @if (session('success'))
+        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+            {{ session('success') }}
+        </div>
+    @endif
     </x-slot>
 
     <div class="py-6">
@@ -14,7 +28,7 @@
                         <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Formulaires') }}</h2>
                         <div class="space-y-1">
                             @foreach($demandes as $demande)
-                                <a href="{{ route('demandes.affecter', $demande->id) }}" 
+                                <a href="{{ route('demandes.affecter', $demande->id) }}"
                                    class="block px-3 py-2 rounded-md text-sm {{ request()->route('demande') == $demande->id ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
                                     <div class="font-medium truncate">{{ $demande->titre }}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -32,14 +46,14 @@
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                                     {{ $selectedDemande->titre }}
                                 </h2>
-                                <span class="px-2 py-1 text-xs rounded-full {{ 
-                                    $selectedDemande->statut === 'en_attente' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
-                                    ($selectedDemande->statut === 'affecte' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
-                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200') 
+                                <span class="px-2 py-1 text-xs rounded-full {{
+                                    $selectedDemande->statut === 'en_attente' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                    ($selectedDemande->statut === 'affecte' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200')
                                 }}">
-                                    {{ 
-                                        $selectedDemande->statut === 'en_attente' ? 'En attente' : 
-                                        ($selectedDemande->statut === 'affecte' ? 'Affecté' : 'Traité') 
+                                    {{
+                                        $selectedDemande->statut === 'en_attente' ? 'En attente' :
+                                        ($selectedDemande->statut === 'affecte' ? 'Affecté' : 'Traité')
                                     }}
                                 </span>
                             </div>
@@ -56,10 +70,10 @@
                                     </div>
                                     <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
                                         <span class="block font-medium">Priorité :</span>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ 
-                                            $selectedDemande->priorite === 'haute' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
-                                            ($selectedDemande->priorite === 'moyenne' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
-                                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200') 
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{
+                                            $selectedDemande->priorite === 'haute' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                                            ($selectedDemande->priorite === 'moyenne' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200')
                                         }}">
                                             {{ ucfirst($selectedDemande->priorite ?? 'N/A') }}
                                         </span>
@@ -111,7 +125,7 @@
                                         <label for="commentaire" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Commentaire (optionnel) :</label>
                                         <textarea id="commentaire" name="commentaire" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md" placeholder="Ajoutez un commentaire sur cette affectation"></textarea>
                                     </div>
-                                    
+
                                     <div class="flex justify-end">
                                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                             {{ $selectedDemande->assigned_user_id ? 'Modifier l\'affectation' : 'Affecter' }}

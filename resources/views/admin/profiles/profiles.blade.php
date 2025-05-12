@@ -2,10 +2,10 @@
 
     <x-slot name="header">
         @if (session('success'))
-    <div class="alert alert-success" style="color: green; margin-bottom: 15px;">
-        {{ session('success') }}
-    </div>
-@endif
+        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+            {{ session('success') }}
+        </div>
+    @endif
 
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">

@@ -46,7 +46,7 @@ public function store(Request $request)
     // Créer la demande avec le titre
     $demande = Demande::create([
         'titre' => $request->input('titre'),
-        'user_id' => auth()->id(), // Si vous avez besoin de l'ID de l'utilisateur actuel
+        'user_id' => null,
     ]);
 
     // Récupérer les champs personnalisés
@@ -102,7 +102,7 @@ public function store(Request $request)
     public function affecterPage($id = null)
     {
         $demandes = Demande::with('champs')->get(); // liste des formulaires
-        $users = User::all();
+        $users = User::where('role','user')->get();
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
@@ -122,7 +122,7 @@ public function store(Request $request)
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
-    $demandes = Demande::with('user')->get();
+    $demandes = Demande::with('user')->latest()->get();
 
     if ($demandes->isEmpty()) {
         abort(404, 'Aucune demande en base');

@@ -1,8 +1,16 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-      Détails de la demande
-    </h2>
+    <div class="flex justify-between items-center">
+      <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        {{ __('Détails de la demande') }}
+      </h2>
+      <a href="{{ route('demandes.affecter') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        {{ __('Retour') }}
+      </a>
+    </div>
   </x-slot>
 
   <div class="py-6">
@@ -10,92 +18,204 @@
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
         <div class="flex flex-col md:flex-row">
 
-          {{-- Sidebar avec navigation --}}
-          <aside class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r p-4 md:h-screen md:overflow-auto">
-            <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-              Formulaires
-            </h2>
-            <nav class="space-y-1">
-              @php
-                // Récupération rapide des demandes si la variable n'existe pas
-                $demandesList = $demandes ?? \App\Models\Demande::all();
+          <aside class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r dark:border-gray-700 p-4 md:min-h-[600px]">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                {{ __('Liste des demandes') }}
+              </h2>
 
-                // Récupération de la demande sélectionnée si elle n'existe pas
+              @if(count($demandes ?? []) > 8)
+                <div class="relative">
+                  <input type="text" id="search-demandes"
+                      class="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Rechercher...">
+                </div>
+              @endif
+            </div>
+
+            <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
+              @php
+                $demandesList = $demandes ?? \App\Models\Demande::with('user')->latest()->get();
+
                 if (!isset($selectedDemande)) {
                     $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
-                    $selectedDemande = $id ? \App\Models\Demande::find($id) : null;
+                    $selectedDemande = $id ? \App\Models\Demande::with('user')->find($id) : null;
                 }
               @endphp
 
-              @foreach($demandesList as $d)
+              @forelse($demandesList as $d)
                 <a href="{{ route('demande', $d->id) }}"
-                   class="block px-3 py-2 rounded-md text-sm
+                   class="flex justify-between items-center px-3 py-2 rounded-md text-sm transition-colors
                      {{ $selectedDemande && $selectedDemande->id === $d->id
-                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200'
+                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border-l-4 border-indigo-500'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
-                  Demande {{ $d->id }}
+                  <div class="truncate">
+                    <span class="font-medium">Demande #{{ $d->id }}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">{{ $d->titre }}</span>
+                  </div>
+                  @if($d->created_at->isToday())
+                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Aujourd'hui</span>
+                  @endif
                 </a>
-              @endforeach
+              @empty
+                <div class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-4">
+                  {{ __('Aucune demande disponible') }}
+                </div>
+              @endforelse
             </nav>
           </aside>
 
-          {{-- Content principal --}}
+          {{-- Contenu principal optimisé --}}
           <main class="w-full md:w-3/4 p-6">
             @if($selectedDemande)
-              <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                  Demande {{ $selectedDemande->id }}
-                </h2>
-              </div>
-
-              {{-- Bloc d'infos simplifié --}}
-              <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div>
-                    <span class="font-medium">ID :</span> {{ $selectedDemande->id ?? 'N/A' }}
-                  </div>
-                  <div>
-                    <span class="font-medium">Titre :</span> {{ $selectedDemande->titre ?? 'N/A' }}
-                  </div>
-                  <div>
-                    <span class="font-medium">ID Utilisateur :</span> {{ $selectedDemande->user_i
-
-
-
-                        ?? 'N/A' }}
+              <div class="mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-0">
+                    {{ $selectedDemande->titre }}
+                  </h2>
+                  <div class="flex space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      ID: {{ $selectedDemande->id }}
+                    </span>
+                    @if($selectedDemande->created_at)
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                        {{ $selectedDemande->created_at->format('d/m/Y') }}
+                      </span>
+                    @endif
                   </div>
                 </div>
               </div>
 
-              {{-- Tableau des détails simplifié --}}
-              <div class="bg-white dark:bg-gray-700 p-4 shadow-sm rounded-lg border border-gray-200 dark:border-gray-600">
-                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">
-                  Détails de la demande
-                </h3>
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                  <thead class="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Titre</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">résponsable</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                      <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-200">{{ $selectedDemande->id }}</td>
-                      <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-200">{{ $selectedDemande->titre }}</td>
-<td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-200">
-    @if($selectedDemande->user)
-        {{ $selectedDemande->user->name }} {{ $selectedDemande->user->prenom ?? '' }} <!-- Ajoutez prénom si nécessaire -->
-    @else
-        N/A
-    @endif
-</td>                    </tr>
-                  </tbody>
-                </table>
+              {{-- Carte d'informations principale --}}
+              <div class="bg-white dark:bg-gray-700 shadow-sm rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden mb-6">
+                <div class="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-3">
+                  <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">
+                    {{ __('Informations générales') }}
+                  </h3>
+                </div>
+
+                <div class="p-4">
+                  <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Identifiant') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
+                        {{ $selectedDemande->id }}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Titre') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
+                        {{ $selectedDemande->titre }}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Responsable') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 flex items-center">
+                        @if($selectedDemande->user)
+                          <span class="inline-block h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-center leading-8 mr-2 text-gray-700 dark:text-gray-300">
+                            {{ substr($selectedDemande->user->name, 0, 1) }}
+                          </span>
+                          {{ $selectedDemande->user->name }} {{ $selectedDemande->user->prenom ?? '' }}
+                        @else
+                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
+                        @endif
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Date de création') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
+                        @if($selectedDemande->created_at)
+                          {{ $selectedDemande->created_at->format('d/m/Y à H:i') }}
+                        @else
+                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non disponible') }}</span>
+                        @endif
+                      </dd>
+                    </div>
+
+                    {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
+                  </dl>
+                </div>
               </div>
+
+              {{-- Section pour afficher les demandes associées si nécessaire --}}
+              @if(isset($selectedDemande->demandes) && count($selectedDemande->demandes) > 0)
+                <div class="bg-white dark:bg-gray-700 shadow-sm rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+                  <div class="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-3">
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">
+                      {{ __('Demandes associées') }} ({{ count($selectedDemande->demandes) }})
+                    </h3>
+                  </div>
+
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                      <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                          <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            {{ __('ID') }}
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            {{ __('Titre') }}
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            {{ __('Responsable') }}
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            {{ __('Date') }}
+                          </th>
+                          <th scope="col" class="relative px-4 py-3">
+                            <span class="sr-only">{{ __('Actions') }}</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
+                        @foreach($selectedDemande->demandes as $sousdemande)
+                          <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                              {{ $sousdemande->id }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">
+                              {{ $sousdemande->titre }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                              @if($sousdemande->user)
+                                {{ $sousdemande->user->name }} {{ $sousdemande->user->prenom ?? '' }}
+                              @else
+                                <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
+                              @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                              @if($sousdemande->created_at)
+                                {{ $sousdemande->created_at->format('d/m/Y') }}
+                              @else
+                                -
+                              @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                              <a href="{{ route('demande', $sousdemande->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                {{ __('Voir') }}
+                              </a>
+                            </td>
+                          </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              @endif
+
             @else
-              <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+              <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 rounded-md">
                 <div class="flex">
                   <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -103,17 +223,43 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
-                      Aucune demande sélectionnée ou la demande n'existe pas.
+                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                      {{ __('Aucune demande sélectionnée ou la demande n\'existe pas.') }}
                     </p>
+                    <div class="mt-4">
+                      <a href="{{ route('demandes.create') }}" class="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-800 border border-transparent rounded-md font-semibold text-xs text-yellow-700 dark:text-yellow-200 uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 dark:focus:ring-offset-gray-800 transition">
+                        {{ __('Créer une nouvelle demande') }}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             @endif
           </main>
-
         </div>
       </div>
     </div>
   </div>
+
+  {{-- Script pour filtrer les demandes dans la barre latérale --}}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('search-demandes');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const searchValue = e.target.value.toLowerCase();
+          const demandesList = document.querySelectorAll('#demandes-list a');
+
+          demandesList.forEach(function(item) {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(searchValue)) {
+              item.style.display = '';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      }
+    });
+  </script>
 </x-app-layout>

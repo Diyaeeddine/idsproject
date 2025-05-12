@@ -15,7 +15,6 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Dashboard utilisateurs
@@ -25,7 +24,6 @@ Route::get('/', function () {
 Route::get('user/dashboard', function () {
     return view('user/dashboard');
 })->middleware(['auth', 'verified', 'user'])->name('dashboard');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -37,19 +35,16 @@ Route::view('admin/dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', 'admin'])
     ->name('admin.dashboard');
 
-
 /*
 |--------------------------------------------------------------------------
 | Gestion du profil utilisateur (authentifié)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified', 'admin')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
 
 /*
 |--------------------------------------------------------------------------
@@ -58,19 +53,15 @@ Route::middleware('auth')->group(function () {
 */
 
 Route::get('/demandes', [DemandeController::class, 'create'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('demandes');
 
 Route::get('admin/demandes', [DemandeController::class, 'adminIndex'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('admin.demandes');
 
 Route::get('admin/demandes/add-demande', [DemandeController::class, 'create'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('demande.add-demande');
 
 Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('demande.store-demande');
 
 Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])
@@ -81,10 +72,9 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
 
     // Route pour afficher les détails de la demande
 
-
-    Route::get('/admin/demandes/demandes/{id?}', [DemandeController::class, 'demandePage'])
+    Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');
-
+});
 
 
 

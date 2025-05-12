@@ -8,37 +8,52 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('profile.update', $user->id) }}">
+                <!-- Form for updating user profile -->
+                <form method="POST" action="{{ route('acce.update', $user->id) }}" class="mt-6 space-y-6">
                     @csrf
                     @method('PUT')
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom</label>
-                        <x-text-input type="text" name="name" value="{{ $user->name }}" class="mt-1 block w-full rounded-md shadow-sm" required />
+                    <!-- Name input field -->
+                    <div>
+                        <x-input-label for="name" :value="__('Nom')" />
+                        <x-text-input
+                            id="name"
+                            name="name"
+                            type="text"
+                            class="mt-1 block w-full"
+                            :value="old('name', $user->name)"
+                            required
+                            autofocus
+                            autocomplete="name"
+                        />
+                        <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <x-text-input type="email" name="email" value="{{ $user->email }}" class="mt-1 block w-full rounded-md shadow-sm" required/>
+                    <!-- Email input field -->
+                    <div>
+                        <x-input-label for="email" :value="__('Email')" />
+                        <x-text-input
+                            id="email"
+                            name="email"
+                            type="email"
+                            class="mt-1 block w-full"
+                            :value="old('email', $user->email)"
+                            required
+                            autocomplete="email"
+                        />
+                        <x-input-error class="mt-2" :messages="$errors->get('email')" />
                     </div>
-
-<div class="mb-4">
-    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rôle</label>
-    <select id="role" name="role"
-        class="mt-1 block w-full rounded-md shadow-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        required>
-        <option value="user" {{ (isset($user) && $user->role == 'user') ? 'selected' : '' }}>Utilisateur</option>
-        <option value="admin" {{ (isset($user) && $user->role == 'admin') ? 'selected' : '' }}>Admin</option>
-    </select>
-</div>
-
-
-
+                    <!-- Submit button -->
                     <div class="flex justify-end">
-                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                            Mettre à jour
-                        </button>
+                        <x-primary-button>{{ __('Mettre à jour') }}</x-primary-button>
                     </div>
+
+                    <!-- Success message after profile update -->
+                    @if (session('status') === 'profile-updated')
+                        <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
+                            {{ __('Profile mis à jour avec succès.') }}
+                        </p>
+                    @endif
                 </form>
             </div>
         </div>

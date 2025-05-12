@@ -35,7 +35,7 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link
                         :href="route('admin.demandes')"
-                        :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes')">
+                        :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes') || request()->routeIs('demande')">
                         {{ __('Demandes') }}
                     </x-nav-link>
 
