@@ -67,8 +67,8 @@ Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])
 Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])
     ->name('demandes.affecter');
 
-Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUser'])
-    ->name('demandes.affecterUser');
+Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUsers'])
+    ->name('demandes.affecterUsers');
 
     Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');

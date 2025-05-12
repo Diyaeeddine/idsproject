@@ -94,26 +94,19 @@ public function store(Request $request)
     {
         $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
         $users = User::All();
+
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
     }
 
-    public function affecterUser(Request $request, $id)
+    public function affecterUsers(Request $request, $id)
     {
         $demande = Demande::findOrFail($id);
-    
-        $id_users = $request->input('id_users'); 
-        dd($id_users);
-        if (is_array($id_users) && count($id_users) > 0) {
-            $demande->users()->sync($id_users);
+        $userIds = json_decode($request->input('user_ids'), true);
+        $demande->users()->sync($userIds);
+        return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
         
-            return redirect()->route('demandes.affecter', $id)
-                ->with('success', 'Utilisateurs affectés avec succès à la demande.');
-        } else {
-            return redirect()->route('demandes.affecter', $id)
-                ->with('error', 'Veuillez sélectionner au moins un utilisateur.');
-        }
     }    
     
 
