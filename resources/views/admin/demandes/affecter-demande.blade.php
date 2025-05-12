@@ -111,8 +111,7 @@
                                     @csrf
                                     <div class="mb-4">
                                         <label for="user_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Affecter à :
-                                            <div id="selected-users-list" class="mt-4 space-x-2">
+                                            Affecter à:<div id="selected-users-list" class="mt-4 flex flex-wrap gap-2">
                                             </div>
                                         </label>
                                         <select id="user_select" class="block w-full pl-3 pr-10 py-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
@@ -122,6 +121,7 @@
                                             @endforeach
                                         </select>
                                 
+
                                 
                                         <input type="hidden" name="user_ids" id="user_ids" value="[]">
                                     </div>
@@ -155,21 +155,48 @@
     
         let selectedIds = [];
     
+        function updateHiddenInput() {
+            hiddenInput.value = JSON.stringify(selectedIds);
+        }
+    
+        function createBadge(userId, userName) {
+            const badge = document.createElement('span');
+            badge.className = 'selected-name bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm mr-2 mb-2 inline-flex items-center';
+            badge.dataset.userId = userId;
+    
+            badge.innerHTML = `
+                ${userName}
+                <button type="button" class="ml-2 text-red-500 hover:text-red-700 font-bold">&times;</button>
+            `;
+    
+            // Bouton suppression
+            badge.querySelector('button').addEventListener('click', () => {
+                // Supprimer de la liste
+                selectedIds = selectedIds.filter(id => id !== userId);
+                updateHiddenInput();
+                badge.remove();
+    
+                // Réactiver l'option dans le select
+                const option = [...select.options].find(opt => opt.value === userId);
+                if (option) option.disabled = false;
+            });
+    
+            selectedList.appendChild(badge);
+        }
+    
         select.addEventListener('change', () => {
             const selectedId = select.value;
             const selectedText = select.options[select.selectedIndex].text;
     
             if (selectedId && !selectedIds.includes(selectedId)) {
                 selectedIds.push(selectedId);
-                hiddenInput.value = JSON.stringify(selectedIds);
+                updateHiddenInput();
     
+                // Désactiver l'option
                 select.options[select.selectedIndex].disabled = true;
-                select.value = '';
+                select.value = ''; // Reset select
     
-                const badge = document.createElement('span');
-                badge.className = 'selected-name bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm mr-2 mb-2 inline-flex items-center';
-                badge.innerText = selectedText;
-                selectedList.appendChild(badge);
+                createBadge(selectedId, selectedText);
             }
         });
     </script>
