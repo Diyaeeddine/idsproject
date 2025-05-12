@@ -111,18 +111,17 @@
                                     @csrf
                                     <div class="mb-4">
                                         <label for="user_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Affecter à:<div id="selected-users-list" class="mt-4 flex flex-wrap gap-2">
-                                            </div>
+                                            Affecter à:
                                         </label>
+                                        <div id="selected-users-list" class="mt-4 flex flex-wrap gap-2">
+                                            {{-- Badges générés par JS --}}
+                                        </div>
                                         <select id="user_select" class="block w-full pl-3 pr-10 py-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                                             <option value="">-- Choisir un utilisateur --</option>
                                             @foreach($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                                             @endforeach
                                         </select>
-                                
-
-                                
                                         <input type="hidden" name="user_ids" id="user_ids" value="[]">
                                     </div>
                                 
@@ -169,20 +168,32 @@
                 <button type="button" class="ml-2 text-red-500 hover:text-red-700 font-bold">&times;</button>
             `;
     
-            // Bouton suppression
             badge.querySelector('button').addEventListener('click', () => {
-                // Supprimer de la liste
                 selectedIds = selectedIds.filter(id => id !== userId);
                 updateHiddenInput();
                 badge.remove();
     
-                // Réactiver l'option dans le select
                 const option = [...select.options].find(opt => opt.value === userId);
                 if (option) option.disabled = false;
             });
     
             selectedList.appendChild(badge);
         }
+    
+        // ✅ Ici on injecte les users affectés via JSON
+        @if($selectedDemande && $selectedDemande->users->count())
+            const alreadyAssignedUsers = @json($selectedDemande->users->map(fn($u) => ['id' => (string)$u->id, 'name' => $u->name]));
+            
+            alreadyAssignedUsers.forEach(user => {
+                selectedIds.push(user.id);
+                createBadge(user.id, user.name);
+    
+                const optionToDisable = [...select.options].find(opt => opt.value === user.id);
+                if (optionToDisable) optionToDisable.disabled = true;
+            });
+    
+            updateHiddenInput();
+        @endif
     
         select.addEventListener('change', () => {
             const selectedId = select.value;
@@ -191,14 +202,12 @@
             if (selectedId && !selectedIds.includes(selectedId)) {
                 selectedIds.push(selectedId);
                 updateHiddenInput();
-    
-                // Désactiver l'option
                 select.options[select.selectedIndex].disabled = true;
-                select.value = ''; // Reset select
-    
+                select.value = '';
                 createBadge(selectedId, selectedText);
             }
         });
     </script>
+    
     
 </x-app-layout>
