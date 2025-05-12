@@ -46,19 +46,22 @@ public function store(Request $request)
     // Créer la demande avec le titre
     $demande = Demande::create([
         'titre' => $request->input('titre'),
-        'user_id' => null,
+        'user_id' => 'required|exists:users,id',
     ]);
 
     // Récupérer les champs personnalisés
     $fields = $request->input('fields', []);
 
-    foreach ($fields as $field) {
+foreach ($fields as $field) {
+    if (!empty($field['key']) && !empty($field['value'])) {
         ChampPersonnalise::create([
             'key' => $field['key'],
             'value' => $field['value'],
             'demande_id' => $demande->id,
         ]);
     }
+}
+
 
     return redirect()->back()->with('success', 'Demande créée avec succès');
 }
