@@ -55,7 +55,7 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
 Route::get('/demandes', [DemandeController::class, 'create'])
     ->name('demandes');
 
-Route::get('admin/demandes', [DemandeController::class, 'adminIndex'])
+Route::get('admin/demandes', [DemandeController::class, 'index'])
     ->name('admin.demandes');
 
 Route::get('admin/demandes/add-demande', [DemandeController::class, 'create'])
@@ -70,8 +70,6 @@ Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecte
 Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUser'])
     ->name('demandes.affecterUser');
 
-    // Route pour afficher les détails de la demande
-
     Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');
 });
@@ -85,34 +83,27 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
 */
 
 // Afficher tous les profils
+Route::middleware('auth', 'verified', 'admin')->group(function () {
+
 Route::get('admin/profiles', [UserController::class, 'index'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('acce.index');
 
-// Ajouter un profil
 Route::get('admin/profile/add-profile', [UserController::class, 'create'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('profile.add-profile');
 
 Route::post('admin/profile/add-profile', [UserController::class, 'store'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('storeProfile');
 
-// Modifier un profil
 Route::get('admin/profiles/edit/{id}', [UserController::class, 'edit'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('acce.edit');
 
 Route::put('profiles/update/{id}', [UserController::class, 'update'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('acce.update');
 
-// Supprimer un profil
 Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
-    ->middleware(['auth', 'verified', 'admin'])
     ->name('acce.delete');
 
-
+});
 /*
 |--------------------------------------------------------------------------
 | Auth Routes

@@ -10,22 +10,10 @@
 
     class UserController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         */
-    public function index(Request $request)
-    {
-        $query = User::query();
-
-        $query->where('role', UserRole::User);
-
-        if ($request->has('search') && $request->search !== null) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        $users = $query->latest()->get();
-
-        return view('admin.profiles.profiles', compact('users'));
+        return view('admin.profiles.add-profile');
+    }
+    public function create_demande(){
+        return view('admin.demandes.add-demande');
     }
 
 
@@ -88,8 +76,8 @@
         public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
         ]);
 
         $user = User::findOrFail($id);
@@ -114,3 +102,49 @@
 
         }
     }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $user=User::find($id);
+        return view('admin.profiles.edit', compact('user'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:admin_users,email,' . $id,
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+    ]);
+
+    return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
+}
+
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('acce.index')->with('success', 'Utilisateur supprimé avec succès.');
+
+    }
+    public function userCreate(){
+        return view('admin.profiles.add-profile');
+
+    }
+}

@@ -14,7 +14,8 @@ class DemandeController extends Controller
      */
     public function index()
     {
-
+        $demands = Demande::with('user')->latest()->get();
+        return view('admin.demandes.show-demande', compact('demands'));
     }
 
 
@@ -25,12 +26,6 @@ class DemandeController extends Controller
     {
         $users = User::all();
         return view('admin.demandes.add-demande', compact('users'));
-    }
-
-    public function adminIndex()
-    {
-        $demands = Demande::all();
-        return view('admin.demandes.show-demande', compact('demands'));
     }
 
     /**
@@ -74,10 +69,6 @@ foreach ($fields as $field) {
 
     }
 
-
-
-
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -104,8 +95,8 @@ foreach ($fields as $field) {
 
     public function affecterPage($id = null)
     {
-        $demandes = Demande::with('champs')->get(); // liste des formulaires
-        $users = User::where('role','user')->get();
+        $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
+        $users = User::All();
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
@@ -144,10 +135,6 @@ public function demandePage($id = null)
         'selectedDemande' => $selectedDemande,
     ]);
 }
-
-
-
-
 
 
 }

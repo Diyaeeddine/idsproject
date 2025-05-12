@@ -35,7 +35,7 @@
                         <div id="custom-fields" class="space-y-2">
                             <div class="flex items-center gap-2">
                                 <label for="titre" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Titre: </label>
-                                <input type="text" name="titre" id="titre" placeholder="Titre de la demande" class="mt-1 block w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>                                <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
+                                <input type="text" name="titre" id="titre" placeholder="Titre de la demande" class="mt-1 block w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
                             </div>
                         </div>
 
