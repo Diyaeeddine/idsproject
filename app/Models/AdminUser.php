@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Enums\UserRole;
 
-class User extends Authenticatable
+class AdminUser extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -16,7 +16,7 @@ class User extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'admin_users';
 
     /**
      * Les attributs pouvant être assignés en masse.
@@ -26,6 +26,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'password',
         'role',
     ];
 
@@ -35,6 +36,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'password',
         'remember_token',
     ];
 
@@ -45,7 +47,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-    
+        'password' => 'hashed',
         'role' => UserRole::class,
     ];
 }

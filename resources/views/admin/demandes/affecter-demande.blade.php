@@ -115,15 +115,10 @@
                                             <option value="">Sélectionner un utilisateur</option>
                                             @foreach($users as $user)
                                                 <option value="{{ $user->id }}" {{ $selectedDemande->assigned_user_id == $user->id ? 'selected' : '' }}>
-                                                    {{ $user->name }} ({{ $user->role }})
+                                                    {{ $user->name }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label for="commentaire" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Commentaire (optionnel) :</label>
-                                        <textarea id="commentaire" name="commentaire" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-md" placeholder="Ajoutez un commentaire sur cette affectation"></textarea>
                                     </div>
                                     
                                     <div class="flex justify-end">
