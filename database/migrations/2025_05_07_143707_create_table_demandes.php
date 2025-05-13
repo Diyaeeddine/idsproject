@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('demandes', function (Blueprint $table) {
-            $table->id(); // crée une colonne "id" en unsignedBigInteger automatiquement
+            $table->id(); 
             $table->string('titre')->nullable(false);
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
     });
     }

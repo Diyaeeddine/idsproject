@@ -14,7 +14,7 @@ class DemandeController extends Controller
      */
     public function index()
     {
-        $demands = Demande::with('user')->latest()->get();
+        $demands = Demande::with('users')->latest()->get();
         return view('admin.demandes.show-demande', compact('demands'));
     }
 
@@ -94,26 +94,15 @@ class DemandeController extends Controller
      */
     public function affecterPage($id = null)
     {
-        // Charger les demandes avec leurs champs et utilisateurs affectés
-        $demandes = Demande::with(['champs', 'users' => function($query) {
-            $query->withPivot('date_affectation');
-        }])->latest()->get();
+        $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
+        $users = User::All();
 
-        // Charger tous les utilisateurs
-        $users = User::all();
-
-        // Charger la demande sélectionnée avec ses relations
-        $selectedDemande = $id ? Demande::with(['champs', 'users' => function($query) {
-            $query->withPivot('date_affectation');
-        }])->findOrFail($id) : null;
+        $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
     }
 
-    /**
-     * Affecter plusieurs utilisateurs à une demande.
-     */
-    public function affecterUser(Request $request, $id)
+    public function affecterUsers(Request $request, $id)
     {
         // Valider que la demande contient au maximum 3 utilisateurs sélectionnés
         $request->validate([
@@ -123,24 +112,12 @@ class DemandeController extends Controller
 
         // Trouver la demande
         $demande = Demande::findOrFail($id);
+        $userIds = json_decode($request->input('user_ids'), true);
+        $demande->users()->sync($userIds);
+        return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
 
-        // Attacher les utilisateurs à la demande via la table pivot
-        foreach ($request->input('user_id') as $userId) {
-            // Vérifier si l'utilisateur est déjà affecté
-            if ($demande->users()->where('user_id', $userId)->exists()) {
-                return back()->with('error', 'Un ou plusieurs utilisateurs sont déjà affectés à cette demande.');
-            }
-
-            // Ajouter l'affectation dans la table pivot
-            $demande->users()->attach($userId, [
-                'date_affectation' => now()
-            ]);
-        }
-
-        // Retourner une confirmation
-        return redirect()->route('demandes.affecter', $id)
-                         ->with('success', 'Demande affectée avec succès.');
     }
+
 
     /**
      * Afficher les informations de la demande sélectionnée.
@@ -154,9 +131,10 @@ class DemandeController extends Controller
             abort(404, 'Aucune demande en base');
         }
 
-        $selectedDemande = $id
-            ? Demande::with(['user', 'champs'])->find($id)
-            : $demandes->first();
+public function demandePage($id = null)
+{
+    // Chargez les demandes avec les utilisateurs associés
+    $demandes = Demande::with('users')->latest()->get();
 
         if (!$selectedDemande) {
             return redirect()->route('demande', $demandes->first()->id);
@@ -167,4 +145,20 @@ class DemandeController extends Controller
             'selectedDemande' => $selectedDemande,
         ]);
     }
+
+    $selectedDemande = $id
+        ? Demande::with('users')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
+        : $demandes->first();
+
+    if (!$selectedDemande) {
+        return redirect()->route('demande', $demandes->first()->id);
+    }
+
+    return view('admin.demandes.show-demande', [
+        'demandes' => $demandes,
+        'selectedDemande' => $selectedDemande,
+    ]);
+}
+
+
 }

@@ -11,7 +11,7 @@ class Demande extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['titre', 'user_id']; // Assurez-vous que 'user_id' est correct
+    protected $fillable = ['titre'];
 
 // Dans App\Models\Demande.php
 // Dans app/Models/Demande.php
@@ -30,5 +30,12 @@ public function users()
     public function champs()
     {
         return $this->hasMany(ChampPersonnalise::class);
+    }
+
+    // Ajoutez cette relation
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'demande_user')
+            ->withTimestamps();
     }
 }

@@ -53,71 +53,10 @@ class User extends Authenticatable
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Relation many-to-many avec les demandes.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    // Many-to-Many relationship with Demandes through demande_user pivot table
-// Dans app/Models/User.php
-public function demandes()
-{
-    return $this->belongsToMany(Demande::class)
-                ->withPivot('date_affectation')
-                ->withTimestamps();
-}
-
-    /**
-     * Vérifie si l'utilisateur a un rôle admin.
-     *
-     * @return bool
-     */
-    public function isAdmin(): bool
+    public function demandes()
     {
-        return $this->role === UserRole::Admin;
+        return $this->belongsToMany(Demande::class, 'demande_user');
     }
 
-    /**
-     * Vérifie si l'utilisateur a un rôle user.
-     *
-     * @return bool
-     */
-    public function isUser(): bool
-    {
-        return $this->role === UserRole::User;
-    }
 
-    /**
-     * Scope pour filtrer les utilisateurs par rôle.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $role
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeByRole($query, $role)
-    {
-        return $query->where('role', $role);
-    }
-
-    /**
-     * Get the user's full name.
-     *
-     * @return string
-     */
-    public function getFullNameAttribute(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the user's password (auto-hashed).
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setPasswordAttribute($value): void
-    {
-        $this->attributes['password'] = bcrypt($value);
-    }
 }

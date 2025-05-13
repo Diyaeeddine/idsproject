@@ -107,22 +107,28 @@
                             {{-- Affectation utilisateur --}}
                             <div class="bg-white dark:bg-gray-700 p-6 shadow-sm rounded-lg border border-gray-200 dark:border-gray-600">
                                 <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-gray-200">Affecter la demande</h3>
-                                <form method="POST" action="{{ route('demandes.affecterUser', $selectedDemande->id) }}">
+                                <form method="POST" action="{{ route('demandes.affecterUsers', $selectedDemande->id) }}" id="affectation-form">
                                     @csrf
                                     <div class="mb-4">
-                                        <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Affecter à :</label>
-                                        <select name="user_id[]" id="user_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" multiple>
-                                            <option value="">Sélectionner un utilisateur</option>
+                                        <label for="user_select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Affecter à:
+                                        </label>
+                                        <div id="selected-users-list" class="mt-4 flex flex-wrap gap-2">
+                                            {{-- Badges générés par JS --}}
+                                        </div>
+                                        <select id="user_select" class="block w-full pl-3 pr-10 py-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                            <option value="">-- Choisir un utilisateur --</option>
                                             @foreach($users as $user)
-                                                <option value="{{ $user->id }}" {{ in_array($user->id, old('user_id', [])) ? 'selected' : '' }}>{{ $user->name }}</option>
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
                                             @endforeach
                                         </select>
-                                        <p class="text-xs text-gray-500 mt-1">Sélectionner jusquà 3 utilisateurs.</p>
+                                        <input type="hidden" name="user_ids" id="user_ids" value="[]">
                                     </div>
 
                                     <div class="flex justify-end">
-                                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            {{ __('Affecter') }}
+                                        <button type="submit"
+                                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            Affecter
                                         </button>
                                     </div>
                                 </form>
@@ -141,15 +147,67 @@
             </div>
         </div>
     </div>
-
-    <!-- Validation côté client pour limiter la sélection à 3 utilisateurs -->
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            var selectedUsers = document.getElementById('user_id').selectedOptions;
-            if (selectedUsers.length > 3) {
-                e.preventDefault();
-                alert('Vous ne pouvez sélectionner que 3 utilisateurs maximum.');
+        const select = document.getElementById('user_select');
+        const hiddenInput = document.getElementById('user_ids');
+        const selectedList = document.getElementById('selected-users-list');
+
+        let selectedIds = [];
+
+        function updateHiddenInput() {
+            hiddenInput.value = JSON.stringify(selectedIds);
+        }
+
+        function createBadge(userId, userName) {
+            const badge = document.createElement('span');
+            badge.className = 'selected-name bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm mr-2 mb-2 inline-flex items-center';
+            badge.dataset.userId = userId;
+
+            badge.innerHTML = `
+                ${userName}
+                <button type="button" class="ml-2 text-red-500 hover:text-red-700 font-bold">&times;</button>
+            `;
+
+            badge.querySelector('button').addEventListener('click', () => {
+                selectedIds = selectedIds.filter(id => id !== userId);
+                updateHiddenInput();
+                badge.remove();
+
+                const option = [...select.options].find(opt => opt.value === userId);
+                if (option) option.disabled = false;
+            });
+
+            selectedList.appendChild(badge);
+        }
+
+        // ✅ Ici on injecte les users affectés via JSON
+        @if($selectedDemande && $selectedDemande->users->count())
+            const alreadyAssignedUsers = @json($selectedDemande->users->map(fn($u) => ['id' => (string)$u->id, 'name' => $u->name]));
+
+            alreadyAssignedUsers.forEach(user => {
+                selectedIds.push(user.id);
+                createBadge(user.id, user.name);
+
+                const optionToDisable = [...select.options].find(opt => opt.value === user.id);
+                if (optionToDisable) optionToDisable.disabled = true;
+            });
+
+            updateHiddenInput();
+        @endif
+
+        select.addEventListener('change', () => {
+            const selectedId = select.value;
+            const selectedText = select.options[select.selectedIndex].text;
+
+            if (selectedId && !selectedIds.includes(selectedId)) {
+                selectedIds.push(selectedId);
+                updateHiddenInput();
+                select.options[select.selectedIndex].disabled = true;
+                select.value = '';
+                createBadge(selectedId, selectedText);
             }
         });
     </script>
+
+
 </x-app-layout>
