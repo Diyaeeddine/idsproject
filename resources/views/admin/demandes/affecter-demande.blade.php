@@ -1,22 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
         <div class='flex justify-between items-center'>
-
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Affectation des demandes') }}
-        </h2>
-        <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {{ __('Retour') }}
-          </a>
-          </div>
-        @if (session('success'))
-        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
-            {{ session('success') }}
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Affectation des demandes') }}
+            </h2>
+            <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                {{ __('Retour') }}
+            </a>
         </div>
-    @endif
+
+        @if (session('success'))
+            <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+                {{ session('success') }}
+            </div>
+        @endif
     </x-slot>
 
     <div class="py-6">
@@ -111,19 +111,18 @@
                                     @csrf
                                     <div class="mb-4">
                                         <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Affecter à :</label>
-                                        <select name="user_id" id="user_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        <select name="user_id[]" id="user_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" multiple>
                                             <option value="">Sélectionner un utilisateur</option>
                                             @foreach($users as $user)
-                                                <option value="{{ $user->id }}" {{ $selectedDemande->assigned_user_id == $user->id ? 'selected' : '' }}>
-                                                    {{ $user->name }}
-                                                </option>
+                                                <option value="{{ $user->id }}" {{ in_array($user->id, old('user_id', [])) ? 'selected' : '' }}>{{ $user->name }}</option>
                                             @endforeach
                                         </select>
+                                        <p class="text-xs text-gray-500 mt-1">Sélectionner jusquà 3 utilisateurs.</p>
                                     </div>
 
                                     <div class="flex justify-end">
                                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            {{ $selectedDemande->assigned_user_id ? 'Modifier l\'affectation' : 'Affecter' }}
+                                            {{ __('Affecter') }}
                                         </button>
                                     </div>
                                 </form>
@@ -134,7 +133,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                                 <p class="mt-2 text-lg font-medium text-gray-600 dark:text-gray-400">Sélectionnez un formulaire</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-500">Choisissez un formulaire dans la liste à gauche pour voir les détails et l'affecter à un utilisateur.</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-500">Choisissez un formulaire dans la liste à gauche pour voir les détails et laffecter à un utilisateur.</p>
                             </div>
                         @endif
                     </div>
@@ -142,4 +141,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Validation côté client pour limiter la sélection à 3 utilisateurs -->
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var selectedUsers = document.getElementById('user_id').selectedOptions;
+            if (selectedUsers.length > 3) {
+                e.preventDefault();
+                alert('Vous ne pouvez sélectionner que 3 utilisateurs maximum.');
+            }
+        });
+    </script>
 </x-app-layout>

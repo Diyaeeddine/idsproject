@@ -91,6 +91,7 @@ Route::get('admin/profiles', [UserController::class, 'index'])
 Route::get('admin/profile/add-profile', [UserController::class, 'create'])
     ->name('profile.add-profile');
 
+
 Route::post('admin/profile/add-profile', [UserController::class, 'store'])
     ->name('storeProfile');
 

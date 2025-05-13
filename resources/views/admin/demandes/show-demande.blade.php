@@ -130,8 +130,9 @@
                         @endif
                       </dd>
                     </div>
+            {{-- la date de creation --}}
 
-                    <div>
+                    {{--  <div>
                       <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {{ __('Date de création') }}
                       </dt>
@@ -142,7 +143,18 @@
                           <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non disponible') }}</span>
                         @endif
                       </dd>
-                    </div>
+                    </div>  --}}
+            {{-- Champs personnalisés --}}
+@foreach($selectedDemande->champs as $champ)
+    <div>
+        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {{ $champ->key }}
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
+            {{ $champ->value }}
+        </dd>
+    </div>
+@endforeach
 
                     {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
                   </dl>
