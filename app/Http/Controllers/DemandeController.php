@@ -6,7 +6,7 @@ use App\Models\Demande;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ChampPersonnalise;
-
+use Illuminate\Support\Facades\DB;
 class DemandeController extends Controller
 {
     /**
@@ -107,31 +107,7 @@ public function store(Request $request)
         $demande->users()->sync($userIds);
         return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
 
-    }
-public function affecterChamps(Request $request, $demandeId)
-{
-    $demande = Demande::findOrFail($demandeId);
-    $userId = $request->input('user_id');
-    $champsIds = $request->input('champs_ids'); // les champs sélectionnés
 
-    // Vérifie si ces champs ont déjà été affectés
-    $alreadyAssignedChamps = $demande->champs()
-        ->whereIn('id', $champsIds)
-        ->whereNotNull('user_id') // Vérifie si un champ a déjà un utilisateur assigné
-        ->exists();
-
-    if ($alreadyAssignedChamps) {
-        return back()->with('error', 'Certains champs ont déjà été affectés à un autre accès.');
-    }
-
-    // Affecter les champs à l'utilisateur sélectionné
-    foreach ($champsIds as $champId) {
-        $champ = ChampPersonnalise::findOrFail($champId);
-        $champ->update([
-            'user_id' => $userId,
-            'date_affectation' => now(),
-        ]);
-    }
 
     return redirect()->route('demandes.affecter', $demande->id)->with('success', 'Champs affectés avec succès.');
 }
@@ -164,6 +140,41 @@ public function demandePage($id = null)
         'selectedDemande' => $selectedDemande,
     ]);
 }
+public function affecterChamps(Request $request, $demandeId)
+{
+    $userId = $request->input('user_id');
+
+    // 1. Affecter la demande à un utilisateur
+    DB::table('demande_user')->insert([
+        'demande_id' => $demandeId,
+        'user_id' => $userId,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    // 2. Mettre à jour uniquement les champs modifiés
+    foreach ($request->input('champs') as $champId => $valeurSoumis) {
+        $champ = DB::table('champ_personnalises')
+            ->where('id', $champId)
+            ->where('demande_id', $demandeId)
+            ->first();
+
+        // Vérifie si la valeur a changé
+        if ($champ && $champ->value !== $valeurSoumis) {
+            DB::table('champ_personnalises')
+                ->where('id', $champId)
+                ->update([
+                    'value' => $valeurSoumis,
+                    'user_id' => $userId,
+                    'updated_at' => now()
+                ]);
+        }
+    }
+
+    return redirect()->back()->with('success', 'Demande et champs mis à jour avec succès.');
+}
+
+
 
 
 }

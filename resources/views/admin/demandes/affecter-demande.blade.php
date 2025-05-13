@@ -57,31 +57,25 @@
                                     }}
                                 </span>
                             </div>
-                                        {{-- Affichage des champs déjà affectés --}}
-                                <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Champs affectés :</h3>
-                                    <div class="bg-white dark:bg-gray-700 overflow-hidden border border-gray-200 dark:border-gray-600 sm:rounded-lg mb-6">
-                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                                            <thead class="bg-gray-50 dark:bg-gray-800">
-                                                <tr>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Clé</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valeur</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">responsable</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-                                                @foreach($selectedDemande->champs as $champ)
-                                                    @if($champ->user_id)  {{-- Seulement les champs affectés --}}
-                                                        <tr>
-                                                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">{{ $champ->key }}</td>
-                                                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">{{ $champ->value }}</td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
 
-                            <form method="POST" action="{{ route('demandes.affecterUsers', $selectedDemande->id) }}">
+                            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
+                                <div class="flex flex-wrap text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
+                                        <span class="block font-medium">Demandeur :</span>
+                                        {{ $selectedDemande->user->name ?? 'N/A' }}
+                                    </div>
+                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
+                                        <span class="block font-medium">Date de demande :</span>
+                                        {{ \Carbon\Carbon::parse($selectedDemande->created_at)->format('d/m/Y H:i') }}
+                                    </div>
+                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Champs personnalisés --}}
+
+                            <form method="POST" action="{{ route('demande.affecterChamps', $selectedDemande->id) }}">
                                 @csrf
                                 <div class="mb-6">
                                     <div class="flex justify-between align-center mb-3">
@@ -120,10 +114,14 @@
                                     </div>
 
                                     <div class="mt-4 hidden" id="submit-container">
-                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Suivant</button>
+                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Finish</button>
                                     </div>
                                 </div>
                             </form>
+
+
+
+
 
                         @else
                             <div class="flex flex-col items-center justify-center h-96 text-center">
@@ -145,7 +143,10 @@
         document.querySelectorAll('input[type="text"]').forEach(input => input.disabled = false);
         document.getElementById('user-select-container').classList.remove('hidden');
         document.getElementById('submit-container').classList.remove('hidden');
+
     }
-</script>
+
+    </script>
+
 
 </x-app-layout>
