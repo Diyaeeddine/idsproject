@@ -52,7 +52,7 @@
         div.className = "flex items-center gap-2";
         div.innerHTML = `
             <input type="text" name="fields[${index}][key]" placeholder="Nom du champ" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
-            <input type="text" name="fields[${index}][value]" placeholder="Valeur" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+            <input type="text" name="fields[${index}][value]" placeholder="Valeur" class="w-1/2 px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" >
             <button type="button" class="remove-row text-red-500 hover:text-red-700">✕</button>
         `;
         container.appendChild(div);

@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
@@ -69,6 +69,8 @@ Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecte
 
 Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUsers'])
     ->name('demandes.affecterUsers');
+    Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterChamps'])
+    ->name('demande.affecterChamps');
 
     Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');

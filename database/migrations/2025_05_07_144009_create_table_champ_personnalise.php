@@ -14,10 +14,13 @@ return new class extends Migration
     Schema::create('champ_personnalises', function (Blueprint $table) {
         $table->id();
         $table->string('key');
-        $table->string('value');
+        $table->string('value')->nullable(true);
         $table->unsignedBigInteger('demande_id');
+        $table->unsignedBigInteger('user_id')->nullable();
         $table->timestamps();
         $table->foreign('demande_id')->references('id')->on('demandes')->onDelete('cascade');
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+
 
     });
     }
