@@ -64,7 +64,7 @@ Route::get('admin/demandes/add-demande', [DemandeController::class, 'create'])
 Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])
     ->name('demande.store-demande');
 
-Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])
+Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])->middleware(['auth', 'verified', 'admin'])
     ->name('demandes.affecter');
 
 Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUsers'])
