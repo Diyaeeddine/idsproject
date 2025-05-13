@@ -13,20 +13,6 @@ class Demande extends Model
 
     protected $fillable = ['titre'];
 
-// Dans App\Models\Demande.php
-// Dans app/Models/Demande.php
-public function users()
-{
-    return $this->belongsToMany(User::class)
-                ->withPivot('date_affectation')
-                ->withTimestamps();
-}
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    // Relationship with custom fields
     public function champs()
     {
         return $this->hasMany(ChampPersonnalise::class);

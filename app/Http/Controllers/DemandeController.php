@@ -18,6 +18,7 @@ class DemandeController extends Controller
         return view('admin.demandes.show-demande', compact('demands'));
     }
 
+
     /**
      * Show the form for creating a new resource.
      */
@@ -30,39 +31,39 @@ class DemandeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // Valider que le titre est présent
-        $request->validate([
-            'titre' => 'required|string|max:255',
+public function store(Request $request)
+{
+    // Valider que le titre est présent
+    $request->validate([
+        'titre' => 'required|string|max:255',
+    ]);
+
+    // Créer la demande avec le titre
+    $demande = Demande::create([
+        'titre' => $request->input('titre'),
+        'user_id' => null,
+    ]);
+
+    // Récupérer les champs personnalisés
+    $fields = $request->input('fields', []);
+
+    foreach ($fields as $field) {
+        ChampPersonnalise::create([
+            'key' => $field['key'],
+            // 'value' => $field['value'],
+            'demande_id' => $demande->id,
         ]);
-
-        // Créer la demande avec le titre
-        $demande = Demande::create([
-            'titre' => $request->input('titre'),
-            'user_id' => null, // Par défaut, pas d'utilisateur affecté
-        ]);
-
-        // Récupérer les champs personnalisés
-        $fields = $request->input('fields', []);
-
-        foreach ($fields as $field) {
-            ChampPersonnalise::create([
-                'key' => $field['key'],
-                'value' => $field['value'],
-                'demande_id' => $demande->id,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Demande créée avec succès');
     }
+
+    return redirect()->back()->with('success', 'Demande créée avec succès');
+}
 
     /**
      * Display the specified resource.
      */
     public function show($id = null)
     {
-        // Afficher les détails de la demande
+
     }
 
     /**
@@ -70,7 +71,7 @@ class DemandeController extends Controller
      */
     public function edit(Demande $demande)
     {
-        // Logic for editing a request (if applicable)
+        //
     }
 
     /**
@@ -78,7 +79,7 @@ class DemandeController extends Controller
      */
     public function update(Request $request, Demande $demande)
     {
-        // Logic for updating a request (if applicable)
+        //
     }
 
     /**
@@ -86,12 +87,9 @@ class DemandeController extends Controller
      */
     public function destroy(Demande $demande)
     {
-        // Logic for deleting a request (if applicable)
+        //
     }
 
-    /**
-     * Afficher la page d'affectation de la demande.
-     */
     public function affecterPage($id = null)
     {
         $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
@@ -104,46 +102,53 @@ class DemandeController extends Controller
 
     public function affecterUsers(Request $request, $id)
     {
-        // Valider que la demande contient au maximum 3 utilisateurs sélectionnés
-        $request->validate([
-            'user_id' => 'required|array|max:3', // Limiter à 3 utilisateurs
-            'user_id.*' => 'exists:users,id', // Vérifier que les utilisateurs existent
-        ]);
-
-        // Trouver la demande
         $demande = Demande::findOrFail($id);
         $userIds = json_decode($request->input('user_ids'), true);
         $demande->users()->sync($userIds);
         return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
 
     }
+public function affecterChamps(Request $request, $demandeId)
+{
+    $demande = Demande::findOrFail($demandeId);
+    $userId = $request->input('user_id');
+    $champsIds = $request->input('champs_ids'); // les champs sélectionnés
+
+    // Vérifie si ces champs ont déjà été affectés
+    $alreadyAssignedChamps = $demande->champs()
+        ->whereIn('id', $champsIds)
+        ->whereNotNull('user_id') // Vérifie si un champ a déjà un utilisateur assigné
+        ->exists();
+
+    if ($alreadyAssignedChamps) {
+        return back()->with('error', 'Certains champs ont déjà été affectés à un autre accès.');
+    }
+
+    // Affecter les champs à l'utilisateur sélectionné
+    foreach ($champsIds as $champId) {
+        $champ = ChampPersonnalise::findOrFail($champId);
+        $champ->update([
+            'user_id' => $userId,
+            'date_affectation' => now(),
+        ]);
+    }
+
+    return redirect()->route('demandes.affecter', $demande->id)->with('success', 'Champs affectés avec succès.');
+}
 
 
-    /**
-     * Afficher les informations de la demande sélectionnée.
-     */
-    public function demandePage($id = null)
-    {
-        // Charger les demandes avec les utilisateurs et les champs personnalisés associés
-        $demandes = Demande::with(['user', 'champs'])->latest()->get();
 
-        if ($demandes->isEmpty()) {
-            abort(404, 'Aucune demande en base');
-        }
+
+
+
 
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
     $demandes = Demande::with('users')->latest()->get();
 
-        if (!$selectedDemande) {
-            return redirect()->route('demande', $demandes->first()->id);
-        }
-
-        return view('admin.demandes.show-demande', [
-            'demandes' => $demandes,
-            'selectedDemande' => $selectedDemande,
-        ]);
+    if ($demandes->isEmpty()) {
+        abort(404, 'Aucune demande en base');
     }
 
     $selectedDemande = $id

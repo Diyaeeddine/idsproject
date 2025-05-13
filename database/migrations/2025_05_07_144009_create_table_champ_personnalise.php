@@ -14,7 +14,7 @@ return new class extends Migration
     Schema::create('champ_personnalises', function (Blueprint $table) {
         $table->id();
         $table->string('key');
-        $table->string('value');
+        $table->string('value')->nullable();  // Permet à la colonne 'value' d'accepter NULL
         $table->unsignedBigInteger('demande_id');
         $table->timestamps();
         $table->foreign('demande_id')->references('id')->on('demandes')->onDelete('cascade');
