@@ -24,27 +24,29 @@
                     <h1 class="text-lg font-medium mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">{{ __('Créer une demande') }}</h1>
 
                     @if (session('success'))
-                    <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+                        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
                         {{ session('success') }}
-                    </div>
-                @endif
+                        </div>
+                    @endif
 
                     <form action="{{ route('demande.store-demande') }}" method="POST" class="space-y-4">
                         @csrf
 
-<div id="custom-fields" class="space-y-2">
-    <div class="flex flex-col items-start gap-2">
-        <label for="titre" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Titre: </label>
-        <input type="text" name="titre" id="titre" placeholder="Titre de la demande" class="mt-1 block w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
-    </div>
-</div>
-
+                        <div id="custom-fields" class="space-y-2">
+                            <div class="flex flex-col items-start gap-2">
+                                <label for="titre" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Titre: </label>
+                                <input type="text" name="titre" id="titre" placeholder="Titre de la demande" class="mt-1 block w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:text-white" required>
+                            </div>
+                        </div>
 
                         <button type="button" id="add-field" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ajouter un champ</button>
 
                         <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Envoyer</button>
                     </form>
-
+                </div>
+            </div>
+        </div>
+    </div>
 <script>
     let index = 1;
     document.getElementById('add-field').addEventListener('click', function () {
@@ -66,10 +68,4 @@
         }
     });
 </script>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
 </x-app-layout>

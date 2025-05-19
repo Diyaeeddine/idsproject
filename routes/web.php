@@ -78,6 +78,7 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
 
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Gestion des utilisateurs (admin)

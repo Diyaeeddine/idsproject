@@ -33,24 +33,21 @@ class DemandeController extends Controller
      */
 public function store(Request $request)
 {
-    // Valider que le titre est présent
     $request->validate([
         'titre' => 'required|string|max:255',
     ]);
 
-    // Créer la demande avec le titre
     $demande = Demande::create([
         'titre' => $request->input('titre'),
         'user_id' => null,
     ]);
 
-    // Récupérer les champs personnalisés
     $fields = $request->input('fields', []);
 
     foreach ($fields as $field) {
         ChampPersonnalise::create([
             'key' => $field['key'],
-            'value' => $field['value'],
+            'value' => null,
             'demande_id' => $demande->id,
         ]);
     }
@@ -100,14 +97,14 @@ public function store(Request $request)
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
     }
 
-    public function affecterUsers(Request $request, $id)
-    {
-        $demande = Demande::findOrFail($id);
-        $userIds = json_decode($request->input('user_ids'), true);
-        $demande->users()->sync($userIds);
-        return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
+    // public function affecterUsers(Request $request, $id)
+    // {
+    //     $demande = Demande::findOrFail($id);
+    //     $userIds = json_decode($request->input('user_ids'), true);
+    //     $demande->users()->sync($userIds);
+    //     return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
         
-    }    
+    // }    
     
 
 
@@ -136,39 +133,32 @@ public function demandePage($id = null)
 }
 public function affecterChamps(Request $request, $demandeId)
 {
+
     $userId = $request->input('user_id');
 
-    // 1. Affecter la demande à un utilisateur
-    DB::table('demande_user')->insert([
-        'demande_id' => $demandeId,
-        'user_id' => $userId,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
+    $demande = Demande::findOrFail($demandeId);
 
-    // 2. Mettre à jour uniquement les champs modifiés
+//syncWithoutDetaching() ajoute un enregistrement si inexistant, sans supprimer les autres, et met à jour created_at / updated_at grâce à withTimestamps() dans la relation.
+    // Attache sans dupliquer si l'entrée existe déjà
+    $demande->users()->syncWithoutDetaching([$userId]);
+
+
     foreach ($request->input('champs') as $champId => $valeurSoumis) {
-        $champ = DB::table('champ_personnalises')
-            ->where('id', $champId)
+        $champ = ChampPersonnalise::where('id', $champId)
             ->where('demande_id', $demandeId)
             ->first();
 
-        // Vérifie si la valeur a changé
         if ($champ && $champ->value !== $valeurSoumis) {
-            DB::table('champ_personnalises')
-                ->where('id', $champId)
-                ->update([
-                    'value' => $valeurSoumis,
-                    'user_id' => $userId,
-                    'updated_at' => now()
-                ]);
+            $champ->update([
+                'value' => $valeurSoumis,
+                'user_id' => $userId,
+                'updated_at' => now(),
+            ]);
         }
     }
 
     return redirect()->back()->with('success', 'Demande et champs mis à jour avec succès.');
 }
-
-
 
 
 }

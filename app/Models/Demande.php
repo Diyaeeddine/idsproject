@@ -21,7 +21,6 @@ class Demande extends Model
     // Ajoutez cette relation
     public function users()
     {
-        return $this->belongsToMany(User::class, 'demande_user')
-            ->withTimestamps();
+        return $this->belongsToMany(User::class, 'demande_user')->withTimestamps();
     }
 }

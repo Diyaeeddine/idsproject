@@ -23,21 +23,46 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col md:flex-row">
-                    {{-- Sidebar --}}
-                    <div class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 md:h-screen md:overflow-auto">
-                        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Formulaires') }}</h2>
-                        <div class="space-y-1">
-                            @foreach($demandes as $demande)
-                                <a href="{{ route('demandes.affecter', $demande->id) }}" 
-                                   class="block px-3 py-2 rounded-md text-sm {{ request()->route('demande') == $demande->id ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
-                                    <div class="font-medium truncate">{{ $demande->titre }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Créé le {{ \Carbon\Carbon::parse($demande->created_at)->format('d/m/Y') }}
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
+{{-- Sidebar --}}
+<div class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 md:h-screen md:overflow-auto">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Formulaires') }}</h2>
+
+    <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
+        @php
+            $demandesList = $demandes ?? \App\Models\Demande::with('users')->latest()->get();
+
+            if (!isset($selectedDemande)) {
+                $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
+                $selectedDemande = $id ? \App\Models\Demande::with('users')->find($id) : null;
+            }
+        @endphp
+
+        @forelse($demandesList as $d)
+            <a href="{{ route('demandes.affecter', $d->id) }}"
+               class="flex justify-between items-center px-3 py-2 rounded-md text-sm transition-colors
+                 {{ $selectedDemande && $selectedDemande->id === $d->id
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border-l-4 border-indigo-500'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+                <div class="truncate">
+                    <span class="font-medium">{{ $d->titre }}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">
+                        Créé le {{ $d->created_at->format('d/m/Y') }}
+                    </span>
+                </div>
+                @if($d->created_at->isToday())
+                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Aujourd'hui
+                    </span>
+                @endif
+            </a>
+        @empty
+            <div class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-4">
+                {{ __('Aucune demande disponible') }}
+            </div>
+        @endforelse
+    </nav>
+</div>
+
 
                     {{-- Content --}}
                     <div class="w-full md:w-3/4 p-6">
@@ -76,11 +101,12 @@
                             {{-- Champs personnalisés --}}
 
                             <form method="POST" action="{{ route('demande.affecterChamps', $selectedDemande->id) }}">
-                                @csrf
+                                @method('POST')
+                                @csrf                            
                                 <div class="mb-6">
                                     <div class="flex justify-between align-center mb-3">
                                         <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Détails du formulaire</h3>
-                                        <button type="button" class="text-white bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-700" onclick="activerEditForm()">Edit</button>
+                                        <button type="button" class="text-white bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-700" onclick="activerEditForm()">Modifier</button>
                                     </div>
 
                                     <div id="user-select-container" class="mb-4 hidden">
@@ -114,16 +140,15 @@
                                     </div>
 
                                     <div class="mt-4 hidden" id="submit-container">
-                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Finish</button>
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                            Affecter
+                                        </button>
+                                        
                                     </div>
                                 </div>
                             </form>
                             
-
-
-
-
-                        @else
+                            @else
                             <div class="flex flex-col items-center justify-center h-96 text-center">
                                 <svg class="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -145,6 +170,36 @@
         document.getElementById('submit-container').classList.remove('hidden');
     
     }
+
+//     document.getElementById('suivantButton').addEventListener('click', function () {
+//     const form = document.querySelector('form');
+//     let modifiedFields = [];
+
+//     document.querySelectorAll('input[type="text"]').forEach(input => {
+//         if (!input.disabled) {
+//             modifiedFields.push(input);
+//         }
+//     });
+
+//     if (modifiedFields.length > 0) {
+//         // Activer tous les champs avant envoi
+//         document.querySelectorAll('input[type="text"]').forEach(input => {
+//             input.disabled = false;
+//         });
+
+//         // Activer le select utilisateur
+//         document.getElementById('user_id').disabled = false;
+
+//         // Soumettre le formulaire après une petite pause
+//         setTimeout(() => {
+//             form.submit();
+//         }, 100); // 100 ms suffit
+
+//     } else {
+//         alert("Aucun champ n'a été modifié.");
+//     }
+// });
+
 
     </script>
     
