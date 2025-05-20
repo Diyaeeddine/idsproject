@@ -133,32 +133,44 @@ public function demandePage($id = null)
 }
 public function affecterChamps(Request $request, $demandeId)
 {
-
     $userId = $request->input('user_id');
 
-    $demande = Demande::findOrFail($demandeId);
-
-//syncWithoutDetaching() ajoute un enregistrement si inexistant, sans supprimer les autres, et met à jour created_at / updated_at grâce à withTimestamps() dans la relation.
-    // Attache sans dupliquer si l'entrée existe déjà
-    $demande->users()->syncWithoutDetaching([$userId]);
-
+    // Evite les doublons dans demande_user
+    DB::table('demande_user')->updateOrInsert(
+        ['demande_id' => $demandeId, 'user_id' => $userId],
+        ['updated_at' => now(), 'created_at' => now()]
+    );
 
     foreach ($request->input('champs') as $champId => $valeurSoumis) {
-        $champ = ChampPersonnalise::where('id', $champId)
+        $champ = DB::table('champ_personnalises')
+            ->where('id', $champId)
             ->where('demande_id', $demandeId)
             ->first();
 
         if ($champ && $champ->value !== $valeurSoumis) {
-            $champ->update([
-                'value' => $valeurSoumis,
-                'user_id' => $userId,
-                'updated_at' => now(),
-            ]);
+            DB::table('champ_personnalises')
+                ->where('id', $champId)
+                ->update([
+                    'value' => $valeurSoumis,
+                    'user_id' => $userId,
+                    'updated_at' => now()
+                ]);
         }
     }
 
-    return redirect()->back()->with('success', 'Demande et champs mis à jour avec succès.');
-}
+    $lastUpdatedAt = DB::table('champ_personnalises')
+        ->where('demande_id', $demandeId)
+        ->whereNotNull('updated_at')
+        ->orderByDesc('updated_at')
+        ->value('updated_at');
 
+return redirect()
+    ->route('demandes.affecter', $demandeId)
+    ->with('success', 'Champs affectés avec succès.')
+    ->with('lastUpdatedAt', now())   // Stocke maintenant
+    ->with('toast_message', true);  // Juste un flag
+
+
+}
 
 }

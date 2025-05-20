@@ -170,37 +170,6 @@
         document.getElementById('submit-container').classList.remove('hidden');
     
     }
-
-//     document.getElementById('suivantButton').addEventListener('click', function () {
-//     const form = document.querySelector('form');
-//     let modifiedFields = [];
-
-//     document.querySelectorAll('input[type="text"]').forEach(input => {
-//         if (!input.disabled) {
-//             modifiedFields.push(input);
-//         }
-//     });
-
-//     if (modifiedFields.length > 0) {
-//         // Activer tous les champs avant envoi
-//         document.querySelectorAll('input[type="text"]').forEach(input => {
-//             input.disabled = false;
-//         });
-
-//         // Activer le select utilisateur
-//         document.getElementById('user_id').disabled = false;
-
-//         // Soumettre le formulaire après une petite pause
-//         setTimeout(() => {
-//             form.submit();
-//         }, 100); // 100 ms suffit
-
-//     } else {
-//         alert("Aucun champ n'a été modifié.");
-//     }
-// });
-
-
     </script>
     
     
