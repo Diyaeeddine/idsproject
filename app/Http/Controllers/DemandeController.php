@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ChampPersonnalise;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class DemandeController extends Controller
 {
     /**
@@ -90,15 +91,24 @@ public function store(Request $request)
         //
     }
 
-    public function affecterPage($id = null)
-    {
-        $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
-        $users = User::All();
+public function affecterPage($id = null)
+{
+    $demandes = Demande::with('champs')->latest()->get();
+    $users = User::all();
 
-        $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
+    $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
-        return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
+    $lastUpdatedAt = null;
+    if ($selectedDemande) {
+        $lastUpdatedAt = $selectedDemande->champs()->whereNotNull('updated_at')
+            ->orderBy('updated_at', 'desc')
+            ->value('updated_at');
     }
+
+    return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande', 'lastUpdatedAt'));
+}
+
+
 
     public function affecterUsers(Request $request, $id)
     {
@@ -111,6 +121,7 @@ public function store(Request $request)
 
     return redirect()->route('demandes.affecter', $demande->id)->with('success', 'Champs affectés avec succès.');
 }
+
 
 
 
@@ -140,26 +151,25 @@ public function demandePage($id = null)
         'selectedDemande' => $selectedDemande,
     ]);
 }
+
+
+
 public function affecterChamps(Request $request, $demandeId)
 {
     $userId = $request->input('user_id');
 
-    // 1. Affecter la demande à un utilisateur
-    DB::table('demande_user')->insert([
-        'demande_id' => $demandeId,
-        'user_id' => $userId,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
+    // Evite les doublons dans demande_user
+    DB::table('demande_user')->updateOrInsert(
+        ['demande_id' => $demandeId, 'user_id' => $userId],
+        ['updated_at' => now(), 'created_at' => now()]
+    );
 
-    // 2. Mettre à jour uniquement les champs modifiés
     foreach ($request->input('champs') as $champId => $valeurSoumis) {
         $champ = DB::table('champ_personnalises')
             ->where('id', $champId)
             ->where('demande_id', $demandeId)
             ->first();
 
-        // Vérifie si la valeur a changé
         if ($champ && $champ->value !== $valeurSoumis) {
             DB::table('champ_personnalises')
                 ->where('id', $champId)
@@ -171,8 +181,25 @@ public function affecterChamps(Request $request, $demandeId)
         }
     }
 
-    return redirect()->back()->with('success', 'Demande et champs mis à jour avec succès.');
+    $lastUpdatedAt = DB::table('champ_personnalises')
+        ->where('demande_id', $demandeId)
+        ->whereNotNull('updated_at')
+        ->orderByDesc('updated_at')
+        ->value('updated_at');
+
+return redirect()
+    ->route('demandes.affecter', $demandeId)
+    ->with('success', 'Champs affectés avec succès.')
+    ->with('lastUpdatedAt', now())   // Stocke maintenant
+    ->with('toast_message', true);  // Juste un flag
+
+
 }
+
+
+
+
+
 
 
 
