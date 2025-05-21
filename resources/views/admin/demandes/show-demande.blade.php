@@ -35,11 +35,11 @@
             
             <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
               @php
-                $demandesList = $demandes ?? \App\Models\Demande::with('user')->latest()->get();
+                $demandesList = $demandes ?? \App\Models\Demande::with('users')->latest()->get();
 
                 if (!isset($selectedDemande)) {
                     $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
-                    $selectedDemande = $id ? \App\Models\Demande::with('user')->find($id) : null;
+                    $selectedDemande = $id ? \App\Models\Demande::with('users')->find($id) : null;
                 }
               @endphp
 
@@ -50,8 +50,9 @@
                         ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border-l-4 border-indigo-500'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
                   <div class="truncate">
-                    <span class="font-medium">Demande #{{ $d->id }}</span>
-                    <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">{{ $d->titre }}</span>
+                    <span class="font-medium">{{$d->titre}}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Créé le {{ $d->created_at->format('d/m/Y') }}</span>
+
                   </div>
                   @if($d->created_at->isToday())
                     <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Aujourd'hui</span>
@@ -98,38 +99,12 @@
                   <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                     <div>
                       <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {{ __('Identifiant') }}
-                      </dt>
-                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                        {{ $selectedDemande->id }}
-                      </dd>
-                    </div>
-                    
-                    <div>
-                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {{ __('Titre') }}
                       </dt>
                       <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
                         {{ $selectedDemande->titre }}
                       </dd>
                     </div>
-                    
-                    <div>
-                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {{ __('Responsable') }}
-                      </dt>
-                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 flex items-center">
-                        @if($selectedDemande->user)
-                          <span class="inline-block h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-center leading-8 mr-2 text-gray-700 dark:text-gray-300">
-                            {{ substr($selectedDemande->user->name, 0, 1) }}
-                          </span>
-                          {{ $selectedDemande->user->name }} {{ $selectedDemande->user->prenom ?? '' }}
-                        @else
-                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
-                        @endif
-                      </dd>
-                    </div>
-                    
                     <div>
                       <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {{ __('Date de création') }}
@@ -142,6 +117,25 @@
                         @endif
                       </dd>
                     </div>
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {{ __('Responsable(s)') }}
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 flex flex-col space-y-2">
+                        @forelse($selectedDemande->users as $user)
+                          <div class="flex items-center">
+                            <span class="inline-block h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-center leading-8 mr-2 text-gray-700 dark:text-gray-300">
+                              {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </span>
+                            <span>{{ $user->name }} {{ $user->prenom ?? '' }}</span>
+                          </div>
+                        @empty
+                          <span class="text-gray-500 dark:text-gray-400 italic">{{ __('Non assigné') }}</span>
+                        @endforelse
+                      </dd>
+                    </div>
+                    
+                  
 
                     {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
                   </dl>
@@ -227,7 +221,7 @@
                       {{ __('Aucune demande sélectionnée ou la demande n\'existe pas.') }}
                     </p>
                     <div class="mt-4">
-                      <a href="{{ route('demandes.create') }}" class="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-800 border border-transparent rounded-md font-semibold text-xs text-yellow-700 dark:text-yellow-200 uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 dark:focus:ring-offset-gray-800 transition">
+                      <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-800 border border-transparent rounded-md font-semibold text-xs text-yellow-700 dark:text-yellow-200 uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 dark:focus:ring-offset-gray-800 transition">
                         {{ __('Créer une nouvelle demande') }}
                       </a>
                     </div>

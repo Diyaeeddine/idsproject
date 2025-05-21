@@ -2,20 +2,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\AdminUser;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Hash;  // Importer la classe Hash
 use Illuminate\Validation\Rules\Password;  // Importer la classe Password
 use Illuminate\Auth\Events\Registered;  // Importer la classe Registered
 
-class UserController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
 public function index(Request $request)
 {
-    $query = User::query();
+    $query = AdminUser::query();
 
     $query->where('role', UserRole::User);
 
@@ -47,12 +47,14 @@ public function index(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.AdminUser::class],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = AdminUser::create([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
@@ -73,7 +75,7 @@ public function index(Request $request)
      */
     public function edit(string $id)
     {
-        $user=User::find($id);
+        $user=AdminUser::find($id);
         return view('admin.profiles.edit', compact('user'));
     }
 
@@ -87,7 +89,7 @@ public function index(Request $request)
         'email' => 'required|email|unique:admin_users,email,' . $id,
     ]);
 
-    $user = User::findOrFail($id);
+    $user = AdminUser::findOrFail($id);
     $user->update([
         'name' => $request->name,
         'email' => $request->email,
@@ -102,7 +104,7 @@ public function index(Request $request)
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = AdminUser::findOrFail($id);
         $user->delete();
 
         return redirect()->route('acce.index')->with('success', 'Utilisateur supprimé avec succès.');
@@ -110,6 +112,21 @@ public function index(Request $request)
     }
     public function userCreate(){
         return view('admin.profiles.add-profile');
+
+    }
+    public function storeUserProfile(Request $request){
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.AdminUser::class],
+        ]);
+
+        $user = AdminUser::create([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        event(new Registered($user));
+        return redirect()->route('acce.index')->with('success', 'Profil créé avec succès');
 
     }
 }

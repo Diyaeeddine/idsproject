@@ -6,7 +6,7 @@ use App\Models\Demande;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ChampPersonnalise;
-
+use Illuminate\Support\Facades\DB;
 class DemandeController extends Controller
 {
     /**
@@ -14,7 +14,8 @@ class DemandeController extends Controller
      */
     public function index()
     {
-
+        $demands = Demande::with('users')->latest()->get();
+        return view('admin.demandes.show-demande', compact('demands'));
     }
 
 
@@ -27,35 +28,26 @@ class DemandeController extends Controller
         return view('admin.demandes.add-demande', compact('users'));
     }
 
-    public function adminIndex()
-    {
-        $demands = Demande::all();
-        return view('admin.demandes.show-demande', compact('demands'));
-    }
-
     /**
      * Store a newly created resource in storage.
      */
 public function store(Request $request)
 {
-    // Valider que le titre est présent
     $request->validate([
         'titre' => 'required|string|max:255',
     ]);
 
-    // Créer la demande avec le titre
     $demande = Demande::create([
         'titre' => $request->input('titre'),
         'user_id' => null,
     ]);
 
-    // Récupérer les champs personnalisés
     $fields = $request->input('fields', []);
 
     foreach ($fields as $field) {
         ChampPersonnalise::create([
             'key' => $field['key'],
-            'value' => $field['value'],
+            'value' => null,
             'demande_id' => $demande->id,
         ]);
     }
@@ -70,10 +62,6 @@ public function store(Request $request)
     {
 
     }
-
-
-
-
 
     /**
      * Show the form for editing the specified resource.
@@ -101,35 +89,37 @@ public function store(Request $request)
 
     public function affecterPage($id = null)
     {
-        $demandes = Demande::with('champs')->get(); // liste des formulaires
-        $users = User::where('role','user')->get();
+        $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
+        $users = User::All();
+
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
     }
 
-    public function affecterUser(Request $request, $id)
-    {
-        $demande = Demande::findOrFail($id);
-        $demande->user_id = $request->input('user_id');
-        $demande->save();
-
-        return redirect()->route('demandes.affecter', $id)->with('success', 'Formulaire affecté avec succès.');
-    }
+    // public function affecterUsers(Request $request, $id)
+    // {
+    //     $demande = Demande::findOrFail($id);
+    //     $userIds = json_decode($request->input('user_ids'), true);
+    //     $demande->users()->sync($userIds);
+    //     return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
+        
+    // }    
+    
 
 
 
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
-    $demandes = Demande::with('user')->latest()->get();
+    $demandes = Demande::with('users')->latest()->get();
 
     if ($demandes->isEmpty()) {
         abort(404, 'Aucune demande en base');
     }
 
     $selectedDemande = $id
-        ? Demande::with('user')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
+        ? Demande::with('users')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
         : $demandes->first();
 
     if (!$selectedDemande) {
@@ -141,10 +131,46 @@ public function demandePage($id = null)
         'selectedDemande' => $selectedDemande,
     ]);
 }
+public function affecterChamps(Request $request, $demandeId)
+{
+    $userId = $request->input('user_id');
+
+    // Evite les doublons dans demande_user
+    DB::table('demande_user')->updateOrInsert(
+        ['demande_id' => $demandeId, 'user_id' => $userId],
+        ['updated_at' => now(), 'created_at' => now()]
+    );
+
+    foreach ($request->input('champs') as $champId => $valeurSoumis) {
+        $champ = DB::table('champ_personnalises')
+            ->where('id', $champId)
+            ->where('demande_id', $demandeId)
+            ->first();
+
+        if ($champ && $champ->value !== $valeurSoumis) {
+            DB::table('champ_personnalises')
+                ->where('id', $champId)
+                ->update([
+                    'value' => $valeurSoumis,
+                    'user_id' => $userId,
+                    'updated_at' => now()
+                ]);
+        }
+    }
+
+    $lastUpdatedAt = DB::table('champ_personnalises')
+        ->where('demande_id', $demandeId)
+        ->whereNotNull('updated_at')
+        ->orderByDesc('updated_at')
+        ->value('updated_at');
+
+return redirect()
+    ->route('demandes.affecter', $demandeId)
+    ->with('success', 'Champs affectés avec succès.')
+    ->with('lastUpdatedAt', now())   // Stocke maintenant
+    ->with('toast_message', true);  // Juste un flag
 
 
-
-
-
+}
 
 }
