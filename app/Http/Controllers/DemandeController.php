@@ -55,33 +55,22 @@ public function store(Request $request)
     return redirect()->back()->with('success', 'Demande créée avec succès');
 }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id = null)
     {
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Demande $demande)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Demande $demande)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Demande $demande)
     {
         //
@@ -96,17 +85,6 @@ public function store(Request $request)
 
         return view('admin.demandes.affecter-demande', compact('demandes', 'users', 'selectedDemande'));
     }
-
-    // public function affecterUsers(Request $request, $id)
-    // {
-    //     $demande = Demande::findOrFail($id);
-    //     $userIds = json_decode($request->input('user_ids'), true);
-    //     $demande->users()->sync($userIds);
-    //     return redirect()->route('demandes.affecter', $id)->with('success', 'Utilisateurs affectés avec succès à la demande.');
-        
-    // }    
-    
-
 
 
 public function demandePage($id = null)

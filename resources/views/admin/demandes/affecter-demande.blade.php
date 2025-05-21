@@ -146,7 +146,6 @@
                                 <div class="mb-6">
                                     <div class="flex justify-between align-center mb-3">
                                         <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Détails du formulaire</h3>
-                                        {{-- Le bouton modifier sans l'attribut onclick --}}
                                         <button type="button" class="text-white bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-700" id="edit-btn">
                                             Modifier
                                         </button>
@@ -206,20 +205,15 @@
     </div>
 
     <script>
-        // Fonction pour activer le formulaire d'édition
         function activerEditForm() {
-            // Activer tous les champs input
+            
             document.querySelectorAll('input[type="text"]').forEach(input => {
                 input.disabled = false;
-                // Optionnel: Changer la couleur de fond pour montrer que les champs sont modifiables
                 input.classList.remove('bg-gray-100', 'dark:bg-gray-600');
                 input.classList.add('bg-white', 'dark:bg-gray-800', 'border', 'border-gray-300', 'dark:border-gray-600');
             });
-            
-            // Afficher le conteneur de selection d'utilisateur
+
             document.getElementById('user-select-container').classList.remove('hidden');
-            
-            // Afficher le conteneur du bouton de soumission
             document.getElementById('submit-container').classList.remove('hidden');
             
             // Cacher le bouton modifier
