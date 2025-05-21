@@ -69,6 +69,14 @@
           {{-- Contenu principal optimisé --}}
           <main class="w-full md:w-3/4 p-6">
             @if($selectedDemande)
+              {{-- Bouton Générer PDF --}}
+              <div class="flex justify-end mb-6">
+                <a href="{{ route('demande.generatePdf', $selectedDemande->id) }}"
+                   class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                   Générer PDF avec QR code
+                </a>
+              </div>
+
               <div class="mb-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-0">
@@ -134,8 +142,6 @@
                         @endforelse
                       </dd>
                     </div>
-
-
 
                     {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
                   </dl>

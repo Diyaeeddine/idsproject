@@ -109,6 +109,16 @@ Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
 });
 /*
 |--------------------------------------------------------------------------
+| pdf + qr code
+|--------------------------------------------------------------------------
+*/
+Route::get('/suivi/{demandeId}/{userId}', [SuiviController::class, 'showForm'])->name('suivi.demande');
+Route::get('/admin/demandes/{demande}/pdf', [DemandeController::class, 'generatePdf'])
+    ->name('demande.generatePdf')
+    ->middleware(['auth', 'admin']); // adapte les middlewares à ta config
+
+/*
+|--------------------------------------------------------------------------
 | Auth Routes
 |--------------------------------------------------------------------------
 */

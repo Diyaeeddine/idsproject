@@ -8,6 +8,10 @@ use App\Models\User;
 use App\Models\ChampPersonnalise;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade as PDF;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+
 class DemandeController extends Controller
 {
     /**
@@ -124,11 +128,6 @@ public function affecterPage($id = null)
 
 
 
-
-
-
-
-
 public function demandePage($id = null)
 {
     // Chargez les demandes avec les utilisateurs associés
@@ -195,6 +194,24 @@ return redirect()
 
 
 }
+
+
+
+public function generatePdf(Demande $demande)
+{
+    $users = $demande->users;
+
+    // Par exemple, on génère un QR code pour le premier user (tu peux adapter)
+    $userId = $users->first()->id ?? null;
+    $url = $userId ? route('suivi.demande', ['demandeId' => $demande->id, 'userId' => $userId]) : '#';
+    $qrCode = QrCode::size(150)->generate($url);
+
+$pdf = PDF::loadView('admin.demandes.pdf', compact('demande', 'users', 'qrCode'));
+
+    return $pdf->download('demande_'.$demande->id.'_suivi.pdf');
+}
+
+
 
 
 
