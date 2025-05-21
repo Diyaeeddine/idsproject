@@ -23,16 +23,16 @@
               <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
                 {{ __('Liste des demandes') }}
               </h2>
-              
+
               @if(count($demandes ?? []) > 8)
                 <div class="relative">
-                  <input type="text" id="search-demandes" 
-                      class="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-indigo-500 focus:border-indigo-500" 
+                  <input type="text" id="search-demandes"
+                      class="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
                       placeholder="Rechercher...">
                 </div>
               @endif
             </div>
-            
+
             <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
               @php
                 $demandesList = $demandes ?? \App\Models\Demande::with('users')->latest()->get();
@@ -69,21 +69,29 @@
           {{-- Contenu principal optimisé --}}
           <main class="w-full md:w-3/4 p-6">
             @if($selectedDemande)
-              <div class="mb-6">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-0">
-                    {{ $selectedDemande->titre }}
-                  </h2>
-                  <div class="flex space-x-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      ID: {{ $selectedDemande->id }}
+              {{-- Titre, ID, date et bouton Générer PDF --}}
+              <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-0">
+                  {{ $selectedDemande->titre }}
+                </h2>
+
+                <div class="flex items-center space-x-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    ID: {{ $selectedDemande->id }}
+                  </span>
+                  @if($selectedDemande->created_at)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                      {{ $selectedDemande->created_at->format('d/m/Y') }}
                     </span>
-                    @if($selectedDemande->created_at)
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                        {{ $selectedDemande->created_at->format('d/m/Y') }}
-                      </span>
-                    @endif
-                  </div>
+                  @endif
+
+                  <a href="{{ route('demande.pdf', $selectedDemande->id) }}"
+                     class="inline-flex items-center px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md shadow-sm transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0l3-3m-3 3l-3-3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+                    </svg>
+                    Générer le PDF
+                  </a>
                 </div>
               </div>
 
@@ -94,7 +102,7 @@
                     {{ __('Informations générales') }}
                   </h3>
                 </div>
-                
+
                 <div class="p-4">
                   <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                     <div>
@@ -134,14 +142,12 @@
                         @endforelse
                       </dd>
                     </div>
-                    
-                  
 
                     {{-- Ajoutez ici d'autres champs pertinents de votre modèle Demande --}}
                   </dl>
                 </div>
               </div>
-              
+
               {{-- Section pour afficher les demandes associées si nécessaire --}}
               @if(isset($selectedDemande->demandes) && count($selectedDemande->demandes) > 0)
                 <div class="bg-white dark:bg-gray-700 shadow-sm rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
@@ -150,7 +156,7 @@
                       {{ __('Demandes associées') }} ({{ count($selectedDemande->demandes) }})
                     </h3>
                   </div>
-                  
+
                   <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                       <thead class="bg-gray-50 dark:bg-gray-800">
@@ -207,7 +213,7 @@
                   </div>
                 </div>
               @endif
-              
+
             @else
               <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 rounded-md">
                 <div class="flex">
@@ -243,7 +249,7 @@
         searchInput.addEventListener('input', function(e) {
           const searchValue = e.target.value.toLowerCase();
           const demandesList = document.querySelectorAll('#demandes-list a');
-          
+
           demandesList.forEach(function(item) {
             const text = item.textContent.toLowerCase();
             if (text.includes(searchValue)) {

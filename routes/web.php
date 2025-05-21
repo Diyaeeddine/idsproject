@@ -1,9 +1,11 @@
     <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -107,6 +109,16 @@ Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
     ->name('acce.delete');
 
 });
+
+
+Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
+
+
+Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.show');
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
