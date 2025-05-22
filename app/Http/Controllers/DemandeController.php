@@ -17,7 +17,12 @@ class DemandeController extends Controller
         $demands = Demande::with('users')->latest()->get();
         return view('admin.demandes.show-demande', compact('demands'));
     }
-
+    public function userDemandes()
+    {
+        $user=auth()->user();
+        $mesdemandes = $user->demandes()->paginate(10);
+        return view('user.demandes', compact('mesdemandes'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -78,7 +83,7 @@ public function store(Request $request)
 
     public function affecterPage($id = null)
     {
-        $demandes = Demande::with('champs')->latest()->get(); // liste des formulaires
+        $demandes = Demande::with('champs')->latest()->get(); 
         $users = User::All();
 
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;

@@ -20,14 +20,10 @@ class Demande extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'demande_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'demande_user');
     }
 
-    /**
-     * Retourne la liste des utilisateurs affectés avec la durée prise pour compléter leur partie,
-     * calculée de façon séquentielle :
-     * durée = temps entre la fin de la tâche précédente et la fin de la tâche actuelle
-     */
+
 public function usersWithDurations()
 {
     $users = $this->users()->orderByPivot('created_at')->get();

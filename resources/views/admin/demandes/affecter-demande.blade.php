@@ -23,7 +23,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col md:flex-row">
-                    {{-- Sidebar --}}
                     <div class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 md:h-screen md:overflow-auto">
                         <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Formulaires') }}</h2>
 
@@ -63,9 +62,7 @@
                         </nav>
                     </div>
 
-                    {{-- Content --}}
                     <div class="w-full md:w-3/4 p-6">
-                        {{-- Élément caché pour stocker les données JSON de session --}}
                         <div id="last-updated-data" data-value="{{ json_encode(session('lastUpdatedAt', null)) }}" class="hidden"></div>
                         
                         @if($selectedDemande)
@@ -96,13 +93,12 @@
                                         {{ \Carbon\Carbon::parse($selectedDemande->created_at)->format('d/m/Y H:i') }}
                                     </div>
                                     <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
-                                        {{-- Conteneur pour le minuteur ou le statut --}}
+                                       
                                         <div id="timer-container" class="text-sm"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Notification Toast pour le minuteur (invisible par défaut) --}}
                             <div id="toast-default" class="hidden fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 text-red-700 bg-red-100 rounded-lg shadow-sm dark:text-red-400 dark:bg-red-900" role="alert" aria-live="assertive" aria-atomic="true">
                                 <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-600 bg-red-200 rounded-lg dark:bg-red-800 dark:text-red-200">
                                     <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
@@ -119,7 +115,6 @@
                                 </button>
                             </div>
 
-                            {{-- Notification Toast pour formulaire complet (invisible par défaut) --}}
                             <div id="toast-success" class="hidden fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 text-green-700 bg-green-100 rounded-lg shadow-sm dark:text-green-400 dark:bg-green-900" role="alert" aria-live="assertive" aria-atomic="true">
                                 <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-600 bg-green-200 rounded-lg dark:bg-green-800 dark:text-green-200">
                                     <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -140,7 +135,6 @@
                                 @method('POST')
                                 @csrf
                                 
-                                {{-- Champ caché pour indiquer si le formulaire est complet --}}
                                 <input type="hidden" id="is-complete" name="is_complete" value="0">
                                 
                                 <div class="mb-6">
@@ -216,64 +210,53 @@
             document.getElementById('user-select-container').classList.remove('hidden');
             document.getElementById('submit-container').classList.remove('hidden');
             
-            // Cacher le bouton modifier
             const editBtn = document.getElementById('edit-btn');
             if (editBtn) {
                 editBtn.style.display = 'none';
             }
         }
 
-        // Fonction pour vérifier si tous les champs ont été remplis
         function checkIfFormIsComplete() {
             const inputs = document.querySelectorAll('.field-input');
             let allFieldsFilled = true;
             
-            // Vérifier si tous les champs ont une valeur
             inputs.forEach(input => {
                 if (!input.value || input.value.trim() === '') {
                     allFieldsFilled = false;
                 }
             });
             
-            // Mettre à jour le champ caché
             document.getElementById('is-complete').value = allFieldsFilled ? '1' : '0';
             
             return allFieldsFilled;
         }
 
-        // S'assurer que le DOM est complètement chargé avant d'attacher les événements
         document.addEventListener('DOMContentLoaded', function() {
-            // Attacher explicitement l'événement de clic au bouton
             const editBtn = document.getElementById('edit-btn');
             if (editBtn) {
                 editBtn.addEventListener('click', activerEditForm);
             }
             
-            // Vérifier si le formulaire est complet au chargement
             const isComplete = checkIfFormIsComplete();
             const timerContainer = document.getElementById('timer-container');
             const toastSuccess = document.getElementById('toast-success');
             
-            // Si le formulaire est complet, afficher le message et ne pas lancer le minuteur
             if (isComplete) {
                 if (timerContainer) {
                     timerContainer.innerHTML = '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Formulaire complet</span>';
                 }
                 
-                // Afficher la notification de succès
                 if (toastSuccess) {
                     toastSuccess.classList.remove('hidden');
                     
-                    // Masquer après 5 secondes
                     setTimeout(() => {
                         toastSuccess.classList.add('hidden');
                     }, 5000);
                 }
                 
-                return; // Ne pas lancer le minuteur
+                return; 
             }
             
-            // Code pour le minuteur et les notifications toast
             const lastUpdatedStr = JSON.parse(document.getElementById('last-updated-data')?.dataset?.value || 'null');
             
             if (!lastUpdatedStr) {
@@ -292,13 +275,11 @@
                     clearInterval(countdown);
                     if (timerContainer) timerContainer.textContent = 'Temps écoulé.';
 
-                    // Affiche la notification toast
                     const toast = document.getElementById('toast-default');
                     if (toast) toast.classList.remove('hidden');
                 }
             }, 1000);
               
-            // Gestionnaire pour fermer le toast d'alerte
             const toastCloseBtn = document.getElementById('toast-close-btn');
             if (toastCloseBtn) {
                 toastCloseBtn.addEventListener('click', () => {
@@ -307,7 +288,6 @@
                 });
             }
             
-            // Gestionnaire pour fermer le toast de succès
             const toastSuccessCloseBtn = document.getElementById('toast-success-close-btn');
             if (toastSuccessCloseBtn) {
                 toastSuccessCloseBtn.addEventListener('click', () => {
@@ -316,31 +296,25 @@
                 });
             }
             
-            // Ajouter des écouteurs pour détecter les changements dans les champs
             document.querySelectorAll('.field-input').forEach(input => {
                 input.addEventListener('change', function() {
-                    // Vérifier si le formulaire est complet après chaque changement
                     const isNowComplete = checkIfFormIsComplete();
                     
                     if (isNowComplete) {
-                        // Arrêter le minuteur et afficher le message
                         clearInterval(countdown);
                         
                         if (timerContainer) {
                             timerContainer.innerHTML = '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Formulaire complet</span>';
                         }
                         
-                        // Cacher la notification d'alerte si elle est visible
                         const toast = document.getElementById('toast-default');
                         if (toast && !toast.classList.contains('hidden')) {
                             toast.classList.add('hidden');
                         }
                         
-                        // Afficher la notification de succès
                         if (toastSuccess) {
                             toastSuccess.classList.remove('hidden');
                             
-                            // Masquer après 5 secondes
                             setTimeout(() => {
                                 toastSuccess.classList.add('hidden');
                             }, 5000);

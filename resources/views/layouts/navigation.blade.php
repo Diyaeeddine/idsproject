@@ -1,7 +1,9 @@
 
 @php
     use App\Enums\UserRole;
+    
 @endphp
+
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,6 +16,7 @@
                     </a>
                 </div>
                 <!-- Navigation Links -->
+                @if(Auth::user()->role === UserRole::Admin)
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')"
                     :active="request()->routeIs('admin.dashboard')">
@@ -46,8 +49,21 @@
                         {{ __('Accés') }}
                     </x-nav-link>
                 </div>
-
-
+                @endif
+                @if(Auth::User()->role===UserRole::User)
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('dashboard')"
+                    :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('user.demandes')"
+                    :active="request()->routeIs('user.demandes')">
+                        {{ __('Mes demandes') }}
+                    </x-nav-link>
+                </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->

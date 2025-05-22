@@ -34,12 +34,13 @@ public function index(Request $request)
      */
     public function create()
     {
+       //
+    }
+    public function createProfile()
+    {
         return view('admin.profiles.add-profile');
     }
-    public function create_demande(){
-        return view('admin.demandes.add-demande');
-    }
-
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -47,18 +48,22 @@ public function index(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', Password::defaults()],
         ]);
-
+    
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => UserRole::User,
         ]);
-
+    
         event(new Registered($user));
+    
         return redirect()->route('acce.index')->with('success', 'Profil créé avec succès');
-
     }
+    
 
     /**
      * Display the specified resource.

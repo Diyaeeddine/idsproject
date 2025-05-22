@@ -15,7 +15,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('auth/login');
+})->name('admin.login');
+Route::get('/register', function () {
+    return view('auth/register');
 });
+
+Route::get('/user/login', [UserController::class, 'create'])->name('user.login');
+
+Route::post('/user/login', [UserController::class, 'store'])->name('user.login.submit');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +45,9 @@ Route::view('admin/dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', 'admin'])
     ->name('admin.dashboard');
 
+    Route::get('user/demandes',[DemandeController::class,'userDemandes'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('user.demandes');
 /*
 |--------------------------------------------------------------------------
 | Gestion du profil utilisateur (authentifié)
@@ -47,7 +58,6 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 /*
 |--------------------------------------------------------------------------
 | Gestion des demandes (admin)
@@ -93,7 +103,7 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
 Route::get('admin/profiles', [UserController::class, 'index'])
     ->name('acce.index');
 
-Route::get('admin/profile/add-profile', [UserController::class, 'create'])
+Route::get('admin/profile/add-profile', [UserController::class, 'createProfile'])
     ->name('profile.add-profile');
 
 Route::post('admin/profile/add-profile', [UserController::class, 'store'])
@@ -108,13 +118,13 @@ Route::put('profiles/update/{id}', [UserController::class, 'update'])
 Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
     ->name('acce.delete');
 
+Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
+
+Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.show');
+
 });
 
 
-Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
-
-
-Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.show');
 
 
 
@@ -124,6 +134,10 @@ Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.sh
 | Auth Routes
 |--------------------------------------------------------------------------
 */
+
+
+
+
 
 require __DIR__.'/auth.php';
 

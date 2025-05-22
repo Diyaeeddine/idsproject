@@ -8,12 +8,10 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <!-- Form for updating user profile -->
                 <form method="POST" action="{{ route('acce.update', $user->id) }}" class="mt-6 space-y-6">
                     @csrf
                     @method('PUT')
 
-                    <!-- Name input field -->
                     <div>
                         <x-input-label for="name" :value="__('Nom')" />
                         <x-text-input 
@@ -29,7 +27,6 @@
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
 
-                    <!-- Email input field -->
                     <div>
                         <x-input-label for="email" :value="__('Email')" />
                         <x-text-input 
@@ -43,12 +40,10 @@
                         />
                         <x-input-error class="mt-2" :messages="$errors->get('email')" />
                     </div>
-                    <!-- Submit button -->
                     <div class="flex justify-end">
                         <x-primary-button>{{ __('Mettre à jour') }}</x-primary-button>
                     </div>
 
-                    <!-- Success message after profile update -->
                     @if (session('status') === 'profile-updated')
                         <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
                             {{ __('Profile mis à jour avec succès.') }}

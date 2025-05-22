@@ -16,12 +16,10 @@ class AddDureeToDemandeUserTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('demande_user', 'duree')) {
+       
             Schema::table('demande_user', function (Blueprint $table) {
-                $table->integer('duree')->nullable()->comment('Durée en secondes pour remplir le formulaire');
-                $table->timestamp('debut_remplissage')->nullable()->comment('Horodatage de début du remplissage');
             });
-        }
+    
     }
 
     /**
@@ -32,8 +30,6 @@ class AddDureeToDemandeUserTable extends Migration
     public function down()
     {
         Schema::table('demande_user', function (Blueprint $table) {
-            $table->dropColumn('duree');
-            $table->dropColumn('debut_remplissage');
         });
     }
 }

@@ -26,6 +26,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'password',
         'role',
     ];
 
@@ -52,6 +53,5 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Demande::class, 'demande_user');
     }
-    
 
 }
