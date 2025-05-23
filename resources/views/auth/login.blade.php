@@ -9,7 +9,7 @@
 @endif
 
 <x-guest-layout>
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    {{-- <nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Left side - empty or logo -->
@@ -24,11 +24,11 @@
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> --}}
     <!-- Session Status -->
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
-    <p class="text-white text-center ">Admin Login</p>
+    {{-- <p class="text-white text-center ">Admin Login</p> --}}
 
     <form method="POST" action="{{ route('login') }}">
         @csrf

@@ -48,6 +48,9 @@ Route::view('admin/dashboard', 'admin.dashboard')
     Route::get('user/demandes',[DemandeController::class,'userDemandes'])
     ->middleware(['auth', 'verified', 'user'])
     ->name('user.demandes');
+    Route::get('/demande/{id}/remplir', [DemandeController::class, 'remplir'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('demande.remplir');
 /*
 |--------------------------------------------------------------------------
 | Gestion du profil utilisateur (authentifié)

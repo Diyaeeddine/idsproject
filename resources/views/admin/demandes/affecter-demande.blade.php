@@ -1,35 +1,39 @@
 <x-app-layout>
     <x-slot name="header">
         <div class='flex justify-between items-center'>
-        
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Affectation des demandes') }}
-        </h2>
-        <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {{ __('Retour') }}
-          </a>
-          </div>
-        @if (session('success'))
-        <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
-            {{ session('success') }}
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Affectation des demandes') }}
+            </h2>
+            <a href="{{ route('demande.add-demande') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                {{ __('Retour') }}
+            </a>
         </div>
-    @endif
+        @if (session('success'))
+            <div class="bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md mt-4">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="bg-red-50 dark:bg-red-900/50 text-red-800 dark:text-red-300 p-4 mb-6 rounded-md mt-4">
+                {{ session('error') }}
+            </div>
+        @endif
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col md:flex-row">
-                    <div class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 md:h-screen md:overflow-auto">
+                    <!-- Sidebar - Liste des demandes -->
+                    <div class="w-full md:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4">
                         <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Formulaires') }}</h2>
-
-                        <nav class="space-y-1 overflow-y-auto max-h-[500px] pr-1" id="demandes-list">
+                        
+                        <nav class="space-y-1">
                             @php
                                 $demandesList = $demandes ?? \App\Models\Demande::with('users')->latest()->get();
-
                                 if (!isset($selectedDemande)) {
                                     $id = request()->route('id') ?? ($demandesList->first()->id ?? null);
                                     $selectedDemande = $id ? \App\Models\Demande::with('users')->find($id) : null;
@@ -38,21 +42,16 @@
 
                             @forelse($demandesList as $d)
                                 <a href="{{ route('demandes.affecter', $d->id) }}"
-                                class="flex justify-between items-center px-3 py-2 rounded-md text-sm transition-colors
-                                    {{ $selectedDemande && $selectedDemande->id === $d->id
-                                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border-l-4 border-indigo-500'
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+                                   class="flex justify-between items-center px-3 py-2 rounded-md text-sm transition-colors
+                                          {{ $selectedDemande && $selectedDemande->id === $d->id
+                                              ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 border-l-4 border-indigo-500'
+                                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
                                     <div class="truncate">
                                         <span class="font-medium">{{ $d->titre }}</span>
                                         <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">
                                             Créé le {{ $d->created_at->format('d/m/Y') }}
                                         </span>
                                     </div>
-                                    @if($d->created_at->isToday())
-                                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                            Aujourd'hui
-                                        </span>
-                                    @endif
                                 </a>
                             @empty
                                 <div class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-4">
@@ -62,9 +61,8 @@
                         </nav>
                     </div>
 
+                    <!-- Main content -->
                     <div class="w-full md:w-3/4 p-6">
-                        <div id="last-updated-data" data-value="{{ json_encode(session('lastUpdatedAt', null)) }}" class="hidden"></div>
-                        
                         @if($selectedDemande)
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
@@ -77,115 +75,119 @@
                                 }}">
                                     {{ 
                                         $selectedDemande->statut === 'en_attente' ? 'En attente' : 
-                                        ($selectedDemande->statut === 'affecte' ? 'Affecté' : 'Traité') 
+                                        ($selectedDemande->statut === 'affecte' ? 'Affecté' : 
+                                        ($selectedDemande->statut === 'partiellement_affecte' ? 'Partiellement affecté' : 'Traité')) 
                                     }}
                                 </span>
                             </div>
 
                             <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
                                 <div class="flex flex-wrap text-sm text-gray-600 dark:text-gray-400">
-                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
-                                        <span class="block font-medium">Demandeur :</span>
-                                        {{ $selectedDemande->user->name ?? 'N/A' }}
-                                    </div>
-                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
+                                    <div class="w-full sm:w-1/2 mb-3">
                                         <span class="block font-medium">Date de demande :</span>
                                         {{ \Carbon\Carbon::parse($selectedDemande->created_at)->format('d/m/Y H:i') }}
                                     </div>
-                                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 mb-3">
-                                       
-                                        <div id="timer-container" class="text-sm"></div>
-                                    </div>
                                 </div>
                             </div>
 
-                            <div id="toast-default" class="hidden fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 text-red-700 bg-red-100 rounded-lg shadow-sm dark:text-red-400 dark:bg-red-900" role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-600 bg-red-200 rounded-lg dark:bg-red-800 dark:text-red-200">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.147 15.085a7.159 7.159 0 0 1-6.189 3.307A6.713 6.713 0 0 1 3.1 15.444c-2.679-4.513.287-8.737.888-9.548A4.373 4.373 0 0 0 5 1.608c1.287.953 6.445 3.218 5.537 10.5 1.5-1.122 2.706-3.01 2.853-6.14 1.433 1.049 3.993 5.395 1.757 9.117Z"/>
-                                    </svg>
-                                    <span class="sr-only">Warning icon</span>
-                                </div>
-                                <div class="ms-3 text-sm font-normal">⚠ Attention : 10 secondes écoulées depuis la dernière affectation !</div>
-                                <button type="button" id="toast-close-btn" class="ms-auto -mx-1.5 -my-1.5 bg-white text-red-400 hover:text-red-900 rounded-lg focus:ring-2 focus:ring-red-300 p-1.5 hover:bg-red-100 inline-flex items-center justify-center h-8 w-8 dark:text-red-500 dark:hover:text-white dark:bg-red-800 dark:hover:bg-red-700" aria-label="Close">
-                                    <span class="sr-only">Close</span>
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div id="toast-success" class="hidden fixed bottom-5 right-5 flex items-center w-full max-w-xs p-4 text-green-700 bg-green-100 rounded-lg shadow-sm dark:text-green-400 dark:bg-green-900" role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-600 bg-green-200 rounded-lg dark:bg-green-800 dark:text-green-200">
-                                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 10l3 3 6-6M3 10a7 7 0 1014 0 7 7 0 00-14 0z"/>
-                                    </svg>
-                                    <span class="sr-only">Check icon</span>
-                                </div>
-                                <div class="ms-3 text-sm font-normal">✓ Tous les champs ont été remplis. Le formulaire est complet !</div>
-                                <button type="button" id="toast-success-close-btn" class="ms-auto -mx-1.5 -my-1.5 bg-white text-green-400 hover:text-green-900 rounded-lg focus:ring-2 focus:ring-green-300 p-1.5 hover:bg-green-100 inline-flex items-center justify-center h-8 w-8 dark:text-green-500 dark:hover:text-white dark:bg-green-800 dark:hover:bg-green-700" aria-label="Close">
-                                    <span class="sr-only">Close</span>
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <form method="POST" action="{{ route('demande.affecterChamps', $selectedDemande->id) }}">
-                                @method('POST')
+                            <form method="POST" action="{{ route('demande.affecterChamps', $selectedDemande->id) }}" id="affectation-form">
                                 @csrf
                                 
-                                <input type="hidden" id="is-complete" name="is_complete" value="0">
-                                
-                                <div class="mb-6">
-                                    <div class="flex justify-between align-center mb-3">
-                                        <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">Détails du formulaire</h3>
-                                        <button type="button" class="text-white bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-700" id="edit-btn">
-                                            Modifier
-                                        </button>
-                                    </div>
+                                <!-- Section d'affectation -->
+                                <div class="bg-white dark:bg-gray-700 p-6 rounded-lg border border-gray-200 dark:border-gray-600 mb-6">
+                                    <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">
+                                        Affectation des champs
+                                    </h3>
 
-                                    <div id="user-select-container" class="mb-4 hidden">
-                                        <label for="user_id" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Affecter à un utilisateur :</label>
-                                        <select name="user_id" id="user_id" class="w-full rounded border-gray-300 dark:bg-gray-800 dark:text-gray-200">
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="bg-white dark:bg-gray-700 overflow-hidden border border-gray-200 dark:border-gray-600 sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                                            <thead class="bg-gray-50 dark:bg-gray-800">
-                                                <tr>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Clé</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valeur</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-                                                @foreach($selectedDemande->champs as $champ)
-                                                    <tr>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">{{ $champ->key }}</td>
-                                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-                                                            <input type="text" name="champs[{{ $champ->id }}]" value="{{ $champ->value }}" placeholder="Valeur de {{ $champ->key }}" class="field-input w-full bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-gray-200 rounded px-2 py-1" disabled>
-                                                        </td>
-                                                    </tr>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Sélection utilisateur -->
+                                        <div>
+                                            <label for="user_id" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Affecter à l'utilisateur :
+                                            </label>
+                                            <select name="user_id" id="user_id" class="w-full rounded-lg border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500" required>
+                                                <option value="">-- Sélectionner un utilisateur --</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                            </select>
+                                        </div>
 
-                                    <div class="mt-4 hidden" id="submit-container">
-                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                            Affecter
-                                        </button>
+                
                                     </div>
+                                </div>
+
+                                <!-- Tableau des champs -->
+                                <div class="bg-white dark:bg-gray-700 overflow-hidden border border-gray-200 dark:border-gray-600 sm:rounded-lg">
+                                    <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
+                                        <h3 class="text-lg font-medium text-gray-800 dark:text-gray-200">
+                                            Champs du formulaire
+
+                                        </h3>
+                                    </div>
+                                    
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                                        <thead class="bg-gray-50 dark:bg-gray-800">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-16">
+                                                    <input type="checkbox" id="select-all-checkbox" class="rounded border-gray-300 text-indigo-600">
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Clé</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valeur actuelle</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Statut</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
+                                            @foreach($selectedDemande->champs as $champ)
+                                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors champ-row">
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <input type="checkbox" 
+                                                               name="champs_selected[]" 
+                                                               value="{{ $champ->id }}" 
+                                                               class="champ-checkbox rounded border-gray-300 text-indigo-600">
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                            {{ $champ->key }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm text-gray-500 dark:text-gray-300">
+                                                            @if($champ->value)
+                                                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded text-xs">{{ Str::limit($champ->value, 50) }}</span>
+                                                            @else
+                                                                <span class="text-gray-400 italic">Vide</span>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        @if($champ->user_id)
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                                Affecté
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                                                En attente
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Boutons d'action -->
+                                <div class="mt-6 flex justify-end">
+                                    <button type="submit" id="submit-btn" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Affecter les champs sélectionnés
+                                    </button>
                                 </div>
                             </form>
                             
                         @else
                             <div class="flex flex-col items-center justify-center h-96 text-center">
-                                <svg class="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                                 <p class="mt-2 text-lg font-medium text-gray-600 dark:text-gray-400">Sélectionnez un formulaire</p>
@@ -199,140 +201,101 @@
     </div>
 
     <script>
-        function activerEditForm() {
-            
-            document.querySelectorAll('input[type="text"]').forEach(input => {
-                input.disabled = false;
-                input.classList.remove('bg-gray-100', 'dark:bg-gray-600');
-                input.classList.add('bg-white', 'dark:bg-gray-800', 'border', 'border-gray-300', 'dark:border-gray-600');
-            });
-
-            document.getElementById('user-select-container').classList.remove('hidden');
-            document.getElementById('submit-container').classList.remove('hidden');
-            
-            const editBtn = document.getElementById('edit-btn');
-            if (editBtn) {
-                editBtn.style.display = 'none';
-            }
-        }
-
-        function checkIfFormIsComplete() {
-            const inputs = document.querySelectorAll('.field-input');
-            let allFieldsFilled = true;
-            
-            inputs.forEach(input => {
-                if (!input.value || input.value.trim() === '') {
-                    allFieldsFilled = false;
-                }
-            });
-            
-            document.getElementById('is-complete').value = allFieldsFilled ? '1' : '0';
-            
-            return allFieldsFilled;
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
-            const editBtn = document.getElementById('edit-btn');
-            if (editBtn) {
-                editBtn.addEventListener('click', activerEditForm);
-            }
-            
-            const isComplete = checkIfFormIsComplete();
-            const timerContainer = document.getElementById('timer-container');
-            const toastSuccess = document.getElementById('toast-success');
-            
-            if (isComplete) {
-                if (timerContainer) {
-                    timerContainer.innerHTML = '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Formulaire complet</span>';
+            const userSelect = document.getElementById('user_id');
+            const champCheckboxes = document.querySelectorAll('.champ-checkbox');
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const selectAllBtn = document.getElementById('select-all');
+            const deselectAllBtn = document.getElementById('deselect-all');
+            const submitBtn = document.getElementById('submit-btn');
+            const form = document.getElementById('affectation-form');
+
+            function updateUI() {
+                const selectedCheckboxes = document.querySelectorAll('.champ-checkbox:checked');
+                const selectedCount = selectedCheckboxes.length;
+                const totalCount = champCheckboxes.length;
+                const userSelected = userSelect.value !== '';
+
+                // Activer/désactiver le bouton submit
+                submitBtn.disabled = !(selectedCount > 0 && userSelected);
+
+                // Gérer l'état du checkbox "Tout sélectionner"
+                if (selectedCount === 0) {
+                    selectAllCheckbox.indeterminate = false;
+                    selectAllCheckbox.checked = false;
+                } else if (selectedCount === totalCount) {
+                    selectAllCheckbox.indeterminate = false;
+                    selectAllCheckbox.checked = true;
+                } else {
+                    selectAllCheckbox.indeterminate = true;
                 }
-                
-                if (toastSuccess) {
-                    toastSuccess.classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                        toastSuccess.classList.add('hidden');
-                    }, 5000);
-                }
-                
-                return; 
-            }
-            
-            const lastUpdatedStr = JSON.parse(document.getElementById('last-updated-data')?.dataset?.value || 'null');
-            
-            if (!lastUpdatedStr) {
-                if (timerContainer) timerContainer.textContent = '';
-                return;
-            }
 
-            let timeLeft = 10;
-            if (timerContainer) timerContainer.textContent = `Temps restant : ${timeLeft} secondes`;
-
-            const countdown = setInterval(() => {
-                timeLeft--;
-                if (timerContainer) timerContainer.textContent = `Temps restant : ${timeLeft} secondes`;
-
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    if (timerContainer) timerContainer.textContent = 'Temps écoulé.';
-
-                    const toast = document.getElementById('toast-default');
-                    if (toast) toast.classList.remove('hidden');
-                }
-            }, 1000);
-              
-            const toastCloseBtn = document.getElementById('toast-close-btn');
-            if (toastCloseBtn) {
-                toastCloseBtn.addEventListener('click', () => {
-                    const toast = document.getElementById('toast-default');
-                    if (toast) toast.classList.add('hidden');
-                });
-            }
-            
-            const toastSuccessCloseBtn = document.getElementById('toast-success-close-btn');
-            if (toastSuccessCloseBtn) {
-                toastSuccessCloseBtn.addEventListener('click', () => {
-                    const toast = document.getElementById('toast-success');
-                    if (toast) toast.classList.add('hidden');
-                });
-            }
-            
-            document.querySelectorAll('.field-input').forEach(input => {
-                input.addEventListener('change', function() {
-                    const isNowComplete = checkIfFormIsComplete();
-                    
-                    if (isNowComplete) {
-                        clearInterval(countdown);
-                        
-                        if (timerContainer) {
-                            timerContainer.innerHTML = '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Formulaire complet</span>';
-                        }
-                        
-                        const toast = document.getElementById('toast-default');
-                        if (toast && !toast.classList.contains('hidden')) {
-                            toast.classList.add('hidden');
-                        }
-                        
-                        if (toastSuccess) {
-                            toastSuccess.classList.remove('hidden');
-                            
-                            setTimeout(() => {
-                                toastSuccess.classList.add('hidden');
-                            }, 5000);
-                        }
+                // Mettre à jour les classes des lignes
+                champCheckboxes.forEach(checkbox => {
+                    const row = checkbox.closest('.champ-row');
+                    if (checkbox.checked) {
+                        row.classList.add('bg-indigo-50', 'dark:bg-indigo-900/20');
+                    } else {
+                        row.classList.remove('bg-indigo-50', 'dark:bg-indigo-900/20');
                     }
                 });
+            }
+
+            // Événements
+            champCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateUI);
             });
+
+            userSelect.addEventListener('change', updateUI);
+
+            selectAllCheckbox.addEventListener('change', function() {
+                champCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateUI();
+            });
+
+            selectAllBtn.addEventListener('click', function() {
+                champCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                updateUI();
+            });
+
+            deselectAllBtn.addEventListener('click', function() {
+                champCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updateUI();
+            });
+
+            // Validation du formulaire
+            form.addEventListener('submit', function(e) {
+                const selectedCheckboxes = document.querySelectorAll('.champ-checkbox:checked');
+                
+                if (selectedCheckboxes.length === 0) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner au moins un champ à affecter.');
+                    return;
+                }
+
+                if (!userSelect.value) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner un utilisateur.');
+                    return;
+                }
+
+                // Confirmation
+                const userName = userSelect.options[userSelect.selectedIndex].text;
+                const confirmMessage = `Êtes-vous sûr de vouloir affecter ${selectedCheckboxes.length} champ(s) à ${userName} ?`;
+                
+                if (!confirm(confirmMessage)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Initialiser l'UI
+            updateUI();
         });
     </script>
-
-    <style>
-        @keyframes fadeInOut {
-            0%, 100% {opacity: 0;}
-            10%, 90% {opacity: 1;}
-        }
-        .animate-fadeInOut {
-            animation: fadeInOut 4s ease forwards;
-        }
-    </style>
-    
 </x-app-layout>
