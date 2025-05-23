@@ -136,8 +136,7 @@
             @endif
         </div>
     </div>
-
-    <script>
+<script>
         function showToast(type, message) {
             if(type === 'new') {
                 const toastNew = document.getElementById('toast-new');
@@ -169,4 +168,5 @@
             @endif
         });
     </script>
+
 </x-app-layout>
