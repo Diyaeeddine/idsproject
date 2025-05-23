@@ -16,13 +16,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('auth/login');
+})->name('admin.login');
+Route::get('/register', function () {
+    return view('auth/register');
 });
+
+Route::get('/user/login', [UserController::class, 'create'])->name('user.login');
+
+Route::post('/user/login', [UserController::class, 'store'])->name('user.login.submit');
+
 
 /*
 |--------------------------------------------------------------------------
 | Dashboard utilisateurs
 |--------------------------------------------------------------------------
 */
+Route::middleware('auth')->group(function () {
+    Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
+    Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
+    Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
+});
 
 Route::get('user/dashboard', [UserDashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'user'])
@@ -38,6 +51,12 @@ Route::view('admin/dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', 'admin'])
     ->name('admin.dashboard');
 
+    Route::get('user/demandes',[DemandeController::class,'userDemandes'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('user.demandes');
+    Route::get('/demande/{id}/remplir', [DemandeController::class, 'remplir'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('demande.remplir');
 /*
 |--------------------------------------------------------------------------
 | Gestion du profil utilisateur (authentifié)
@@ -48,7 +67,6 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 /*
 |--------------------------------------------------------------------------
 | Gestion des demandes (admin)
@@ -94,7 +112,7 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
 Route::get('admin/profiles', [UserController::class, 'index'])
     ->name('acce.index');
 
-Route::get('admin/profile/add-profile', [UserController::class, 'create'])
+Route::get('admin/profile/add-profile', [UserController::class, 'createProfile'])
     ->name('profile.add-profile');
 
 Route::post('admin/profile/add-profile', [UserController::class, 'store'])
@@ -109,21 +127,17 @@ Route::put('profiles/update/{id}', [UserController::class, 'update'])
 Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
     ->name('acce.delete');
 
-});
-
-
 Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
-
 
 Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.show');
 
-
-
-Route::middleware('auth')->group(function () {
-    Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
-    Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
-    Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
 });
+
+
+
+
+
+
 
 // Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
 //     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
@@ -134,6 +148,10 @@ Route::middleware('auth')->group(function () {
 | Auth Routes
 |--------------------------------------------------------------------------
 */
+
+
+
+
 
 require __DIR__.'/auth.php';
 

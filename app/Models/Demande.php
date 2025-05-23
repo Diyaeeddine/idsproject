@@ -13,22 +13,26 @@ class Demande extends Model
 
     protected $fillable = ['titre'];
 
+    /**
+     * Relation entre Demande et ChampPersonnalise
+     * Une demande peut avoir plusieurs champs personnalisés
+     */
     public function champs()
     {
         return $this->hasMany(ChampPersonnalise::class);
     }
 
+    /**
+     * Relation entre Demande et User
+     * Une demande peut être associée à plusieurs utilisateurs via la table pivot
+     */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'demande_user')
-                    ->withPivot('is_filled', 'created_at', 'updated_at')
-                    ->withTimestamps();
+        return $this->belongsToMany(User::class, 'demande_user');
     }
 
     /**
-     * Récupère les utilisateurs avec durée entre assignations.
-     *
-     * @return array
+     * Fonction qui calcule la durée entre l'attribution de la demande et la complétion
      */
     public function usersWithDurations()
     {

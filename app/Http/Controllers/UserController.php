@@ -1,113 +1,109 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Enums\UserRole;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;  // Importer la classe Hash
+use Illuminate\Validation\Rules\Password;  // Importer la classe Password
+use Illuminate\Auth\Events\Registered;  // Importer la classe Registered
 
 class UserController extends Controller
 {
     /**
-     * Affiche la liste des utilisateurs (admins uniquement)
+     * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $query = User::query();
+public function index(Request $request)
+{
+    $query = User::query();
 
-        $query->where('role', UserRole::User);
+    $query->where('role', UserRole::User);
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        $users = $query->latest()->get();
-
-        return view('admin.profiles.profiles', compact('users'));
+    if ($request->has('search') && $request->search !== null) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
+
+    $users = $query->latest()->get();
+
+    return view('admin.profiles.profiles', compact('users'));
+}
+
 
     /**
-     * Formulaire de création d'un profil utilisateur
+     * Show the form for creating a new resource.
      */
-<<<<<<< Updated upstream
     public function create()
     {
-        return view('admin.profiles.add-profile');
+       //
     }
-    public function create_demande(){
-        return view('admin.demandes.add-demande');
-    }
-=======
     public function createProfile()
     {
         return view('admin.profiles.add-profile');
     }
->>>>>>> Stashed changes
 
     /**
-     * Stocke un nouvel utilisateur
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-<<<<<<< Updated upstream
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-=======
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', Password::defaults()],
->>>>>>> Stashed changes
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => UserRole::User,
         ]);
 
         event(new Registered($user));
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         return redirect()->route('acce.index')->with('success', 'Profil créé avec succès');
+    }
 
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
     }
 
     /**
-     * Formulaire d'édition utilisateur
+     * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        $user = User::findOrFail($id);
+        $user=User::find($id);
         return view('admin.profiles.edit', compact('user'));
     }
 
     /**
-     * Met à jour un utilisateur
+     * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:admin_users,email,' . $id,
+    ]);
 
-        $user = User::findOrFail($id);
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+    $user = User::findOrFail($id);
+    $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+    ]);
 
-        return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
-    }
+    return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
+}
+
 
     /**
-     * Supprime un utilisateur
+     * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
@@ -115,58 +111,34 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('acce.index')->with('success', 'Utilisateur supprimé avec succès.');
-    }
 
-    /**
-     * Vue création utilisateur (redondant avec createProfile)
-     */
-    public function userCreate()
-    {
+    }
+    public function userCreate(){
         return view('admin.profiles.add-profile');
+
     }
+    // Dans le UserController
+public function userDemandes()
+{
+    $user = Auth::user();
 
-    /**
-     * Affiche les demandes assignées à l'utilisateur connecté et alertes
-     */
-    public function userDemandes()
-    {
-        $user = Auth::user();
+    // Récupérer les demandes de l'utilisateur
+    $mesdemandes = $user->demandes()->paginate(10);
 
-        $mesdemandes = $user->demandes()->paginate(10);
+    // Récupérer les nouvelles demandes (moins de 1 minute)
+    $nouvellesDemandes = $user->demandes()
+        ->wherePivot('is_filled', false)
+        ->wherePivot('created_at', '>', Carbon::now()->subMinute())
+        ->get();
 
-        $nouvellesDemandes = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('created_at', '>', Carbon::now()->subMinute())
-            ->get();
+    // Récupérer les demandes en retard (plus de 1 minute)
+    $demandesEnRetard = $user->demandes()
+        ->wherePivot('is_filled', false)
+        ->wherePivot('created_at', '<=', Carbon::now()->subMinute())
+        ->get();
 
-        $demandesEnRetard = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('created_at', '<=', Carbon::now()->subMinute())
-            ->get();
+    // Passer les données à la vue
+    return view('user.demandes', compact('mesdemandes', 'nouvellesDemandes', 'demandesEnRetard'));
+}
 
-        return view('user.demandes', compact('mesdemandes', 'nouvellesDemandes', 'demandesEnRetard'));
-    }
-
-    /**
-     * Endpoint pour récupérer les alertes en JSON (pour AJAX)
-     */
-    public function getAlerts()
-    {
-        $user = Auth::user();
-
-        $nouvellesDemandes = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('created_at', '>', now()->subMinute())
-            ->count();
-
-        $demandesEnRetard = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('created_at', '<=', now()->subMinute())
-            ->count();
-
-        return response()->json([
-            'nouvelles' => $nouvellesDemandes,
-            'retard' => $demandesEnRetard,
-        ]);
-    }
 }

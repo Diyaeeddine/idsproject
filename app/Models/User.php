@@ -16,6 +16,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'password',
         'role',
     ];
 
@@ -28,6 +29,10 @@ class User extends Authenticatable
         'role' => UserRole::class,
     ];
 
+    /**
+     * Relation entre User et Demande
+     * Un utilisateur peut avoir plusieurs demandes via la table pivot
+     */
     public function demandes()
     {
         return $this->belongsToMany(Demande::class, 'demande_user')
