@@ -4,6 +4,7 @@ use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -23,9 +24,9 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('user/dashboard', function () {
-    return view('user/dashboard');
-})->middleware(['auth', 'verified', 'user'])->name('dashboard');
+Route::get('user/dashboard', [UserDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -118,6 +119,15 @@ Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.sh
 
 
 
+Route::middleware('auth')->group(function () {
+    Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
+    Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
+    Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
+});
+
+// Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+//     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+// });
 
 /*
 |--------------------------------------------------------------------------

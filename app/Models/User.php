@@ -11,47 +11,27 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * Nom de la table associée au modèle.
-     *
-     * @var string
-     */
     protected $table = 'users';
 
-    /**
-     * Les attributs pouvant être assignés en masse.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'role',
     ];
 
-    /**
-     * Les attributs à cacher lors de la sérialisation.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'remember_token',
     ];
 
-    /**
-     * Les conversions de type pour les attributs.
-     *
-     * @var array<string, string|\Illuminate\Contracts\Database\Eloquent\CastsAttributes>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
-    
         'role' => UserRole::class,
     ];
+
     public function demandes()
     {
-        return $this->belongsToMany(Demande::class, 'demande_user');
+        return $this->belongsToMany(Demande::class, 'demande_user')
+                    ->withPivot('is_filled', 'created_at', 'updated_at')
+                    ->withTimestamps();
     }
-    
-
 }
