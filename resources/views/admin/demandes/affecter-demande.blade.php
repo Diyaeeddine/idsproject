@@ -130,7 +130,6 @@
                                         <thead class="bg-gray-50 dark:bg-gray-800">
                                             <tr>
                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-16">
-                                                    <input type="checkbox" id="select-all-checkbox" class="rounded border-gray-300 text-indigo-600">
                                                 </th>
                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Clé</th>
                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valeur actuelle</th>
@@ -204,7 +203,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userSelect = document.getElementById('user_id');
             const champCheckboxes = document.querySelectorAll('.champ-checkbox');
-            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const selectAllCheckbox = document.getElementById('');
             const selectAllBtn = document.getElementById('select-all');
             const deselectAllBtn = document.getElementById('deselect-all');
             const submitBtn = document.getElementById('submit-btn');
@@ -220,15 +219,6 @@
                 submitBtn.disabled = !(selectedCount > 0 && userSelected);
 
                 // Gérer l'état du checkbox "Tout sélectionner"
-                if (selectedCount === 0) {
-                    selectAllCheckbox.indeterminate = false;
-                    selectAllCheckbox.checked = false;
-                } else if (selectedCount === totalCount) {
-                    selectAllCheckbox.indeterminate = false;
-                    selectAllCheckbox.checked = true;
-                } else {
-                    selectAllCheckbox.indeterminate = true;
-                }
 
                 // Mettre à jour les classes des lignes
                 champCheckboxes.forEach(checkbox => {
