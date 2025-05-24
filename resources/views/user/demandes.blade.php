@@ -22,9 +22,6 @@
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            ID
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Titre
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -42,14 +39,8 @@
                                     @foreach($mesdemandes as $demande)
 
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                #{{ $demande->id }}
-                                            </td>
                                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                                 <div class="font-medium">{{ $demande->titre ?? 'N/A' }}</div>
-                                                @if($demande->category ?? false)
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $demande->category }}</div>
-                                                @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 <div>{{ $demande->created_at->format('d/m/Y') }}</div>

@@ -146,12 +146,12 @@ public function index(Request $request)
         
         $nouvellesDemandes = $user->demandes()
             ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '>', now()->subMinute())
+            ->wherePivot('updated_at', '>', now()->subMinute(60))
             ->get();
              
         $demandesEnRetard = $user->demandes()
             ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '<=', now()->subMinute())
+            ->wherePivot('updated_at', '<=', now()->subMinute(60))
             ->get();
              
         return view('user.demandes', compact('mesdemandes', 'nouvellesDemandes', 'demandesEnRetard'));
@@ -163,12 +163,12 @@ public function index(Request $request)
 
         $nouvellesDemandes = $user->demandes()
             ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '>', now()->subMinute())
+            ->wherePivot('updated_at', '>', now()->subMinute(60))
             ->count();
 
         $demandesEnRetard = $user->demandes()
             ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '<=', now()->subMinute())
+            ->wherePivot('updated_at', '<=', now()->subMinute(60))
             ->count();
 
         return response()->json([
@@ -182,20 +182,14 @@ public function index(Request $request)
 
     $nouvellesDemandes = $user->demandes()
         ->wherePivot('is_filled', false)
-        ->wherePivot('updated_at', '>', now()->subMinute())
+        ->wherePivot('updated_at', '>', now()->subMinute(60))
         ->get();
 
     $demandesEnRetard = $user->demandes()
         ->wherePivot('is_filled', false)
-        ->wherePivot('updated_at', '<=', now()->subMinute())
+        ->wherePivot('updated_at', '<=', now()->subMinute(60))
         ->get();
 
-    return view('user.dashboard', [
-        'nouvellesDemandes' => $nouvellesDemandes,
-        'demandesEnRetard' => $demandesEnRetard,
-    ]);
-}
-public function remplirDemande(){
-    return '';
+    return view('user.dashboard', ['nouvellesDemandes' => $nouvellesDemandes,'demandesEnRetard' => $demandesEnRetard]);
 }
 }

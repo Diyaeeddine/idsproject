@@ -177,14 +177,15 @@ public function showRemplir($id){
     return view('user.remplirDemande', compact('user', 'demande', 'champs'));
 }
 public function remplir(Request $request, $id){
-
+    $user = Auth::user();
     $demande = Demande::findOrFail($id);
 
     foreach ($request->input('values', []) as $champId => $value) {
         $champ = ChampPersonnalise::find($champId);
-        if ($champ && $champ->demande_id == $demande->id) { 
+        if ($champ && $champ->demande_id == $demande->id && $champ->user_id == $user->id ) { 
             $champ->value = $value;
             $champ->save();
+            $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => true]);
         }
     }
     return redirect()->back()->with('success','Champs mis à jour avec succès.');
