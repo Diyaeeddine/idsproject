@@ -4,7 +4,6 @@
     </x-slot>
 
    <div class="flex flex-col md:flex-row h-full">
-    <!-- Sidebar -->
     <div class="w-full md:w-1/4 bg-white text-gray-800 dark:bg-gray-800 border-b md:border-b-0 md:border-r border-gray-300 dark:border-gray-700 p-4">
         <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">Titres</h3>
         <ul class="space-y-2">
@@ -19,24 +18,21 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="w-full md:w-3/4 p-4 overflow-x-auto">
         @if ($selectedTable)                   
 
-            <div class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300 text-sm">
-                <a href="{{ route('budget-tables.export', $selectedTable->id) }}" class="...">
-    <i class="fas fa-file-pdf"></i> Exporter en PDF
-</a>
-
+            <div class="mb-4 text-right">
+                <a href="{{ route('budget-tables.export', $selectedTable->id) }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-200">
+                    <i class="fas fa-file-pdf"></i> Exporter en PDF
+                </a>
             </div>
 
-            <!-- Table wrapper for horizontal scroll -->
             <div class="overflow-x-auto">
-                <table class="min-w-full table-auto border border-black border-collapse text-sm">
+                <table class="w-3/4 table-auto border border-black border-collapse text-sm">
                     <thead>
                         <tr class="border border-black">
                             <th colspan="4"
-                                class="text-center text-black bg-blue-800 dark:bg-blue-900 dark:text-white text-base md:text-xl font-bold py-2 border border-black">
+                                class="text-center text-white bg-blue-800 dark:bg-blue-900 dark:text-white text-base md:text-xl font-bold py-2 border border-black">
                                 {{ $selectedTable->title }}
                             </th>
                         </tr>
@@ -48,7 +44,7 @@
                             </th>
                         </tr>
 
-                        <tr class="bg-blue-800 text-black text-xs md:text-sm dark:bg-blue-900 dark:text-white border border-black">
+                        <tr class="bg-blue-800 text-white text-s md:text-sm dark:bg-blue-900 dark:text-white border border-black">
                             <th class="border border-black px-2 md:px-4 py-2">Imputation<br>comptable</th>
                             <th class="border border-black px-2 md:px-4 py-2">Intitulé</th>
                             <th class="border border-black px-2 md:px-4 py-2">Budget<br>Prévisionnel</th>
