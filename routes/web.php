@@ -5,6 +5,7 @@ use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BudgetTableController;
 
 
 /*
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('auth/login');
+    return redirect('/login');
 })->name('admin.login');
 Route::get('/register', function () {
     return view('auth/register');
@@ -30,10 +31,19 @@ Route::post('/user/login', [UserController::class, 'store'])->name('user.login.s
 | Dashboard utilisateurs
 |--------------------------------------------------------------------------
 */
+Route::middleware('auth')->group(function () {
+    Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
+    Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
+    Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
+    Route::get('user/demande/afficher/{id}', [DemandeController::class, 'show'])->name('user.demandes.voir');
+    Route::get('user/demande/remplir/{id}', [DemandeController::class, 'remplir'])->name('user.demandes.remplir');
+    // Route::get('/user/demandes/afficher/{id}', [UserController::class, 'show'])->name('user.demandes.voir');
 
-Route::get('user/dashboard', function () {
-    return view('user/dashboard');
-})->middleware(['auth', 'verified', 'user'])->name('dashboard');
+});
+Route::get('user/dashboard', [UserController::class, 'userDashboard'])
+    ->middleware(['auth', 'verified', 'user'])
+    ->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -45,9 +55,6 @@ Route::view('admin/dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', 'admin'])
     ->name('admin.dashboard');
 
-    Route::get('user/demandes',[DemandeController::class,'userDemandes'])
-    ->middleware(['auth', 'verified', 'user'])
-    ->name('user.demandes');
     Route::get('/demande/{id}/remplir', [DemandeController::class, 'remplir'])
     ->middleware(['auth', 'verified', 'user'])
     ->name('demande.remplir');
@@ -123,11 +130,16 @@ Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
 
 Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
 
-Route::get('demande/{id}', [DemandeController::class, 'show'])->name('demande.show');
 
 });
 
 
+Route::prefix('admin')->middleware(['auth', 'verified','admin'])->group(function () {
+    Route::get('/budgetaires/create', [BudgetTableController::class, 'create'])->name('budget-tables.create');
+    Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');
+    Route::get('/tables-budgetaires', [BudgetTableController::class, 'index'])->name('budget-tables.index');
+    Route::get('/tables-budgetaires/{id}', [BudgetTableController::class, 'show'])->name('budget-tables.show');
+});
 
 
 

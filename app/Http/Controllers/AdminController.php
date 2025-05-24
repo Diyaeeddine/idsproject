@@ -10,7 +10,9 @@ use Illuminate\Auth\Events\Registered;  // Importer la classe Registered
 
 class AdminController extends Controller
 {
-  
+  public function login(){
+    return redirect()-
+  }
 public function index(Request $request)
 {
     $query = User::query();

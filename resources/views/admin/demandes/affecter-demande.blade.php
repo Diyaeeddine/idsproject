@@ -52,6 +52,9 @@
                                             Créé le {{ $d->created_at->format('d/m/Y') }}
                                         </span>
                                     </div>
+                                    @if($d->created_at->isToday())
+                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Aujourd'hui</span>
+                  @endif
                                 </a>
                             @empty
                                 <div class="text-sm text-gray-500 dark:text-gray-400 italic text-center py-4">
@@ -176,9 +179,8 @@
                                     </table>
                                 </div>
 
-                                <!-- Boutons d'action -->
                                 <div class="mt-6 flex justify-end">
-                                    <button type="submit" id="submit-btn" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <button type="submit" id="submit-btn" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" disabled>
                                         Affecter les champs sélectionnés
                                     </button>
                                 </div>
@@ -203,89 +205,32 @@
         document.addEventListener('DOMContentLoaded', function() {
             const userSelect = document.getElementById('user_id');
             const champCheckboxes = document.querySelectorAll('.champ-checkbox');
-            const selectAllCheckbox = document.getElementById('');
-            const selectAllBtn = document.getElementById('select-all');
-            const deselectAllBtn = document.getElementById('deselect-all');
             const submitBtn = document.getElementById('submit-btn');
-            const form = document.getElementById('affectation-form');
-
+            const champRows = document.querySelectorAll('.champ-row');
+    
             function updateUI() {
                 const selectedCheckboxes = document.querySelectorAll('.champ-checkbox:checked');
-                const selectedCount = selectedCheckboxes.length;
-                const totalCount = champCheckboxes.length;
                 const userSelected = userSelect.value !== '';
-
-                // Activer/désactiver le bouton submit
-                submitBtn.disabled = !(selectedCount > 0 && userSelected);
-
-                // Gérer l'état du checkbox "Tout sélectionner"
-
-                // Mettre à jour les classes des lignes
-                champCheckboxes.forEach(checkbox => {
-                    const row = checkbox.closest('.champ-row');
-                    if (checkbox.checked) {
-                        row.classList.add('bg-indigo-50', 'dark:bg-indigo-900/20');
-                    } else {
-                        row.classList.remove('bg-indigo-50', 'dark:bg-indigo-900/20');
-                    }
-                });
+    
+                submitBtn.disabled = !(selectedCheckboxes.length > 0 && userSelected);
             }
-
-            // Événements
+            
+            champRows.forEach(row => {
+                row.addEventListener('click', function (e) {
+                    if (e.target.tagName.toLowerCase() === 'input') return;
+    
+                    const checkbox = row.querySelector('.champ-checkbox');
+                    checkbox.checked = !checkbox.checked;
+                    updateUI();
+                });
+            });
+    
             champCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', updateUI);
             });
-
             userSelect.addEventListener('change', updateUI);
-
-            selectAllCheckbox.addEventListener('change', function() {
-                champCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateUI();
-            });
-
-            selectAllBtn.addEventListener('click', function() {
-                champCheckboxes.forEach(checkbox => {
-                    checkbox.checked = true;
-                });
-                updateUI();
-            });
-
-            deselectAllBtn.addEventListener('click', function() {
-                champCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                updateUI();
-            });
-
-            // Validation du formulaire
-            form.addEventListener('submit', function(e) {
-                const selectedCheckboxes = document.querySelectorAll('.champ-checkbox:checked');
-                
-                if (selectedCheckboxes.length === 0) {
-                    e.preventDefault();
-                    alert('Veuillez sélectionner au moins un champ à affecter.');
-                    return;
-                }
-
-                if (!userSelect.value) {
-                    e.preventDefault();
-                    alert('Veuillez sélectionner un utilisateur.');
-                    return;
-                }
-
-                // Confirmation
-                const userName = userSelect.options[userSelect.selectedIndex].text;
-                const confirmMessage = `Êtes-vous sûr de vouloir affecter ${selectedCheckboxes.length} champ(s) à ${userName} ?`;
-                
-                if (!confirm(confirmMessage)) {
-                    e.preventDefault();
-                }
-            });
-
-            // Initialiser l'UI
             updateUI();
         });
     </script>
+    
 </x-app-layout>

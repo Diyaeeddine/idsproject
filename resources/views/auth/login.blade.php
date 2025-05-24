@@ -1,12 +1,3 @@
-@if ($errors->any())
-    <div>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li style="color:red;">{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 
 <x-guest-layout>
     {{-- <nav class="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">

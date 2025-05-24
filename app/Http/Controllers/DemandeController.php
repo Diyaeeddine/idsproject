@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ChampPersonnalise;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 class DemandeController extends Controller
 {
     /**
@@ -19,10 +21,14 @@ class DemandeController extends Controller
     }
     public function userDemandes()
     {
-        $user=auth()->user();
-        $mesdemandes = $user->demandes()->paginate(10);
+        $user = auth()->user();
+        $mesdemandes = $user->demandes()
+            ->withPivot('is_filled', 'updated_at')
+            ->paginate(10);
+    
         return view('user.demandes', compact('mesdemandes'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -60,10 +66,19 @@ public function store(Request $request)
     return redirect()->back()->with('success', 'Demande créée avec succès');
 }
 
-    public function show($id = null)
-    {
+public function show($id)
+{
+    $user = Auth::user(); 
 
-    }
+    $demande = Demande::findOrFail($id);
+
+    $champs = ChampPersonnalise::where('demande_id', $id)
+        ->where('user_id', $user->id)
+        ->get();
+
+    return view('user.voirDemande', compact('user', 'demande', 'champs'));
+}
+
 
     public function edit(Demande $demande)
     {
@@ -115,116 +130,51 @@ public function demandePage($id = null)
 }
 public function affecterChamps(Request $request, $demandeId) 
 {
-    // 1. Récupérer les données du formulaire
-    $userId = $request->input('user_id');
-    $selectedChampIds = $request->input('champs_selected', []);
-    
-    // 2. Vérifier que les données sont correctes
     $request->validate([
         'user_id' => 'required|exists:users,id',
         'champs_selected' => 'required|array|min:1',
         'champs_selected.*' => 'exists:champ_personnalises,id'
     ]);
 
-    try {
-        // 3. Commencer une transaction (pour pouvoir annuler si ça échoue)
-        DB::beginTransaction();
-        
-        // 4. Vérifier que la demande existe bien
-        $demande = DB::table('demandes')->find($demandeId);
-        if (!$demande) {
-            return redirect()->back()->with('error', 'Cette demande n\'existe pas.');
-        }
-        
-        // 5. Vérifier que les champs appartiennent bien à cette demande
-        $champsValides = DB::table('champ_personnalises')
-            ->where('demande_id', $demandeId)
-            ->whereIn('id', $selectedChampIds)
-            ->count();
-            
-        if ($champsValides !== count($selectedChampIds)) {
-            return redirect()->back()->with('error', 'Certains champs ne correspondent pas à cette demande.');
-        }
-        
-        // 6. Affecter les champs à l'utilisateur
-        DB::table('champ_personnalises')
-            ->whereIn('id', $selectedChampIds)
-            ->update([
-                'user_id' => $userId,
-                'updated_at' => now()
-            ]);
-        
-        // 7. Créer le lien entre la demande et l'utilisateur
-        DB::table('demande_user')->updateOrInsert(
-            [
-                'demande_id' => $demandeId, 
-                'user_id' => $userId
-            ],
-            [
-                'created_at' => now(), 
-                'updated_at' => now()
-            ]
-        );
-        
-        // 8. Calculer le nouveau statut de la demande
-        $totalChamps = DB::table('champ_personnalises')
-            ->where('demande_id', $demandeId)
-            ->count();
-            
-        $champsAffectes = DB::table('champ_personnalises')
-            ->where('demande_id', $demandeId)
-            ->whereNotNull('user_id')
-            ->count();
-        
-        // Déterminer le statut
-        if ($champsAffectes === 0) {
-            $nouveauStatut = 'en_attente';
-        } elseif ($champsAffectes === $totalChamps) {
-            $nouveauStatut = 'affecte';
-        } else {
-            $nouveauStatut = 'partiellement_affecte';
-        }
-        
-        // 9. Mettre à jour la date de modification de la demande
-        DB::table('demandes')
-            ->where('id', $demandeId)
-            ->update(['updated_at' => now()]);
-        
-        // 10. Valider toutes les modifications
-        DB::commit();
-        
-        // 11. Préparer le message de succès
-        $user = DB::table('users')->find($userId);
-        $userName = $user ? $user->name : 'l\'utilisateur';
-        $nombreChamps = count($selectedChampIds);
-        
-        $message = $nombreChamps === 1 
-            ? "1 champ a été affecté à {$userName}" 
-            : "{$nombreChamps} champs ont été affectés à {$userName}";
-        
-        return redirect()
-            ->route('demandes.affecter', $demandeId)
-            ->with('success', $message);
-            
-    } catch (\Exception $e) {
-        // 12. En cas d'erreur, annuler toutes les modifications
-        DB::rollback();
-        
-        // Enregistrer l'erreur dans les logs
-        \Log::error('Erreur affectation champs', [
-            'demande_id' => $demandeId,
-            'user_id' => $userId,
-            'erreur' => $e->getMessage()
-        ]);
-        
-        return redirect()
-            ->route('demandes.affecter', $demandeId)
-            ->with('error', 'Une erreur s\'est produite lors de l\'affectation des champs.')
-            ->withInput();
-    }
-}
-public function remplire(){
+    $userId = $request->input('user_id');
+    $selectedChampIds = $request->input('champs_selected', []);
 
-    return view('');
+    $champsValides = DB::table('champ_personnalises')
+        ->where('demande_id', $demandeId)
+        ->whereIn('id', $selectedChampIds)
+        ->count();
+        
+    if ($champsValides !== count($selectedChampIds)) {
+        return redirect()->back()->with('error', 'Certains champs ne correspondent pas à cette demande.');
+    }
+    
+    DB::table('champ_personnalises')
+        ->whereIn('id', $selectedChampIds)
+        ->update(['user_id' => $userId, 'updated_at' => now()]);
+    
+    DB::table('demande_user')->updateOrInsert(
+        ['demande_id' => $demandeId, 'user_id' => $userId],
+        ['created_at' => now(), 'updated_at' => now()]
+    );
+    
+    DB::table('demandes')->where('id', $demandeId)->update(['updated_at' => now()]);
+    
+    $nombreChamps = count($selectedChampIds);
+    $userName = DB::table('users')->find($userId)->name;
+    $message = $nombreChamps === 1 ? "1 champ affecté à {$userName}" : "{$nombreChamps} champs affectés à {$userName}";
+    
+    return redirect()->route('demandes.affecter', $demandeId)->with('success', $message);
+}
+public function remplir(){
+
+    $user = Auth::user(); 
+
+    $demande = Demande::findOrFail($id);
+
+    $champs = ChampPersonnalise::where('demande_id', $id)
+        ->where('user_id', $user->id)
+        ->get();
+
+    return view('user.remplirDemande', compact('user', 'demande', 'champs'));
 }
 }
