@@ -1,6 +1,6 @@
 <!-- Container pour toutes les notifications -->
 <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-4 pointer-events-none">
-  
+    @if(isset($nouvellesDemandes) && $nouvellesDemandes->count() > 0)
     <div id="toast-new"
          class="hidden pointer-events-auto flex items-center w-full max-w-xs p-4 text-blue-700 bg-blue-100 rounded-lg shadow-md dark:text-blue-400 dark:bg-blue-900 transform transition-all duration-300 ease-in-out"
          role="alert" aria-live="assertive" aria-atomic="true">
@@ -20,8 +20,9 @@
             </svg>
         </button>
     </div>
-
+@endif
     <!-- Toast pour demandes en retard -->
+    @if(isset($demandesEnRetard) && $demandesEnRetard->count() > 0)
     <div id="toast-late"
          class="hidden pointer-events-auto flex items-center w-full max-w-xs p-4 text-red-700 bg-red-100 rounded-lg shadow-md dark:text-red-400 dark:bg-red-900 transform transition-all duration-300 ease-in-out"
          role="alert" aria-live="assertive" aria-atomic="true">
@@ -41,48 +42,7 @@
             </svg>
         </button>
     </div>
-
-    <!-- Toast pour succès -->
-    <div id="toast-success"
-         class="hidden pointer-events-auto flex items-center w-full max-w-xs p-4 text-green-700 bg-green-100 rounded-lg shadow-md dark:text-green-400 dark:bg-green-900 transform transition-all duration-300 ease-in-out"
-         role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-600 bg-green-200 rounded-lg dark:bg-green-800 dark:text-green-200">
-            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m7 10 2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-            </svg>
-            <span class="sr-only">Success icon</span>
-        </div>
-        <div id="toast-success-message" class="ms-3 text-sm font-normal flex-1"></div>
-        <button type="button" id="toast-success-close-btn"
-                class="ms-auto -mx-1.5 -my-1.5 bg-white text-green-400 hover:text-green-900 rounded-lg focus:ring-2 focus:ring-green-300 p-1.5 hover:bg-green-100 inline-flex items-center justify-center h-8 w-8 dark:text-green-500 dark:hover:text-white dark:bg-green-800 dark:hover:bg-green-700 transition-colors duration-200"
-                aria-label="Close">
-            <span class="sr-only">Close</span>
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Toast pour erreurs -->
-    <div id="toast-error"
-         class="hidden pointer-events-auto flex items-center w-full max-w-xs p-4 text-red-700 bg-red-100 rounded-lg shadow-md dark:text-red-400 dark:bg-red-900 transform transition-all duration-300 ease-in-out"
-         role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-600 bg-red-200 rounded-lg dark:bg-red-800 dark:text-red-200">
-            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-            </svg>
-            <span class="sr-only">Error icon</span>
-        </div>
-        <div id="toast-error-message" class="ms-3 text-sm font-normal flex-1"></div>
-        <button type="button" id="toast-error-close-btn"
-                class="ms-auto -mx-1.5 -my-1.5 bg-white text-red-400 hover:text-red-900 rounded-lg focus:ring-2 focus:ring-red-300 p-1.5 hover:bg-red-100 inline-flex items-center justify-center h-8 w-8 dark:text-red-500 dark:hover:text-white dark:bg-red-800 dark:hover:bg-red-700 transition-colors duration-200"
-                aria-label="Close">
-            <span class="sr-only">Close</span>
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-            </svg>
-        </button>
-    </div>
+    @endif
 </div>
 
 <script>
@@ -94,7 +54,7 @@ class ToastManager {
 
     init() {
         document.addEventListener('DOMContentLoaded', () => {
-            // Setup close buttons
+     
             const closeButtons = [
                 'toast-new-close-btn',
                 'toast-late-close-btn', 
@@ -111,8 +71,6 @@ class ToastManager {
                     });
                 }
             });
-
-            // Test automatique (à supprimer en production)
             setTimeout(() => {
                 this.showToast('new', "Vous avez nouvelles demandes à traiter.");
             }, 1000);

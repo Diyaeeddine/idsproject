@@ -34,9 +34,10 @@ Route::post('/user/login', [UserController::class, 'store'])->name('user.login.s
 Route::middleware('auth')->group(function () {
     Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
     Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
-    Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
+    // Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
     Route::get('user/demande/afficher/{id}', [DemandeController::class, 'show'])->name('user.demandes.voir');
-    Route::get('user/demande/remplir/{id}', [DemandeController::class, 'remplir'])->name('user.demandes.remplir');
+    Route::get('user/demande/remplir/{id}', [DemandeController::class, 'showRemplir'])->name('user.demandes.showRemplir');
+    Route::post('user/demande/remplir/{id}', [DemandeController::class, 'remplir'])->name('user.demandes.remplir');
     // Route::get('/user/demandes/afficher/{id}', [UserController::class, 'show'])->name('user.demandes.voir');
 
 });

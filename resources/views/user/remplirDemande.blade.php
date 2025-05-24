@@ -10,8 +10,13 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                @if (session('success'))
+                <div class="success-alert bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+                    {{ session('success') }}
+                </div>
+                @endif
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="" method="POST">
+                    <form action="{{route('user.demandes.remplir',$demande->id)}}" method="POST">
                         @csrf
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

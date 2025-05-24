@@ -165,8 +165,7 @@ public function affecterChamps(Request $request, $demandeId)
     
     return redirect()->route('demandes.affecter', $demandeId)->with('success', $message);
 }
-public function remplir(){
-
+public function showRemplir($id){
     $user = Auth::user(); 
 
     $demande = Demande::findOrFail($id);
@@ -176,5 +175,19 @@ public function remplir(){
         ->get();
 
     return view('user.remplirDemande', compact('user', 'demande', 'champs'));
+}
+public function remplir(Request $request, $id){
+
+    $demande = Demande::findOrFail($id);
+
+    foreach ($request->input('values', []) as $champId => $value) {
+        $champ = ChampPersonnalise::find($champId);
+        if ($champ && $champ->demande_id == $demande->id) { 
+            $champ->value = $value;
+            $champ->save();
+        }
+    }
+    return redirect()->back()->with('success','Champs mis à jour avec succès.');
+
 }
 }

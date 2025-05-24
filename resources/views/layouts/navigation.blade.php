@@ -73,7 +73,7 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('user.demandes')"
-                    :active="request()->routeIs('user.demandes')">
+                    :active="request()->routeIs('user.demandes') || request()->routeIs('user.demandes.showRemplir')">
                         {{ __('Mes demandes') }}
                     </x-nav-link>
                 </div>

@@ -122,24 +122,21 @@ public function index(Request $request)
         $user = Auth::user();
         $mesdemandes = $user->demandes()->paginate(10);
         
-        // Calculer le temps écoulé pour chaque demande
         foreach ($mesdemandes as $demande) {
-            $createdAt = $demande->created_at;
+            $updated_at = $demande->updated_at;
             $now = now();
-            
-            // Calcul de la différence en minutes
-            $diffInMinutes = $createdAt->diffInMinutes($now);
-            
-            // Formatage du temps écoulé
+
+            $diffInMinutes = round($updated_at->diffInMinutes($now));
+
             if ($diffInMinutes < 60) {
                 $demande->temps_ecoule = $diffInMinutes . ' min';
                 $demande->temps_ecoule_minutes = $diffInMinutes;
-            } elseif ($diffInMinutes < 1440) { // moins de 24h
+            } elseif ($diffInMinutes < 1440) { 
                 $hours = floor($diffInMinutes / 60);
                 $minutes = $diffInMinutes % 60;
                 $demande->temps_ecoule = $hours . 'h ' . $minutes . 'min';
                 $demande->temps_ecoule_minutes = $diffInMinutes;
-            } else { // plus de 24h
+            } else { 
                 $days = floor($diffInMinutes / 1440);
                 $hours = floor(($diffInMinutes % 1440) / 60);
                 $demande->temps_ecoule = $days . 'j ' . $hours . 'h';
