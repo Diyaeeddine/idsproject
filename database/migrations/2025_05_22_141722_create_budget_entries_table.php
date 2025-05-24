@@ -11,8 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // database/migrations/xxxx_xx_xx_create_budget_entries_table
-    Schema::create('budget_entries', function (Blueprint $table) {
+            Schema::create('budget_entries', function (Blueprint $table) {
         $table->id();
         $table->foreignId('budget_table_id')->constrained()->onDelete('cascade');
         $table->string('imputation_comptable')->nullable();
@@ -20,6 +19,8 @@ return new class extends Migration
         $table->boolean('is_header')->default(false);
         $table->decimal('budget_previsionnel', 15, 2)->nullable();
         $table->decimal('atterrissage', 15, 2)->nullable();
+        $table->string('b_title')->nullable();
+        $table->integer('position')->nullable(); 
         
         $table->timestamps();
     });

@@ -140,6 +140,7 @@ Route::prefix('admin')->middleware(['auth', 'verified','admin'])->group(function
     Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');
     Route::get('/tables-budgetaires', [BudgetTableController::class, 'index'])->name('budget-tables.index');
     Route::get('/tables-budgetaires/{id}', [BudgetTableController::class, 'show'])->name('budget-tables.show');
+    Route::get('/admin/budget-tables/export/{id}', [BudgetTableController::class, 'exportPdf'])->name('budget-tables.export');
 });
 
 

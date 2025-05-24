@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('budget_tables', function (Blueprint $table) {
         $table->id();
-        $table->string('title'); // e.g., "BOUREGREG MARINA"
-        $table->string('prevision_label'); // e.g., "Prévisions Budgétaires 2025"
+        $table->string('title'); 
+        $table->string('prevision_label'); 
         $table->timestamps();
     });
     }
