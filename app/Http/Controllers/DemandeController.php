@@ -8,7 +8,8 @@ use App\Models\User;
 use App\Models\ChampPersonnalise;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\BudgetTable;
+use App\Models\BudgetEntry;
 class DemandeController extends Controller
 {
     /**
@@ -36,29 +37,41 @@ class DemandeController extends Controller
      * Store a newly created resource in storage.
      */
 
-public function store(Request $request)
-{
-    $request->validate([
-        'titre' => 'required|string|max:255',
-    ]);
-
-    $demande = Demande::create([
-        'titre' => $request->input('titre'),
-        'user_id' => null,
-    ]);
-
-    $fields = $request->input('fields', []);
-
-    foreach ($fields as $field) {
-        ChampPersonnalise::create([
-            'key' => $field['key'],
-            'value' => null,
-            'demande_id' => $demande->id,
-        ]);
-    }
-
-    return redirect()->back()->with('success', 'Demande créée avec succès');
-}
+     public function store(Request $request)
+     {
+         $request->validate([
+             'titre' => 'required|string|max:255',
+         ]);
+     
+         $demande = Demande::create([
+             'titre' => $request->input('titre'),
+             'user_id' => null,
+         ]);
+     
+         if (session()->has('selected_imputation')) {
+         $imputation = session('selected_imputation');
+     
+         $entry = BudgetEntry::where('imputation_comptable', $imputation['imputation'])->first();
+     
+         if ($entry) {
+             $demande->budgetEntries()->attach($entry->id);
+         } else {
+             logger("BudgetEntry not found for imputation: " . $imputation['imputation']);
+         }
+     }
+     
+         $fields = $request->input('fields', []);
+     
+         foreach ($fields as $field) {
+             ChampPersonnalise::create([
+                 'key' => $field['key'],
+                 'value' => null,
+                 'demande_id' => $demande->id,
+             ]);
+         }
+     
+         return redirect()->back()->with('success', 'Demande créée avec succès');
+     }
 
 public function show($id)
 {
@@ -252,4 +265,74 @@ public function remplir(Request $request, $id)
 
     return redirect()->route('user.demandes')->with('success', 'Sauvegarde avec succès.');
 }
+public function selectBudgetTable()
+{
+    $tables = BudgetTable::with('entries')->get();
+    return view('admin.demandes.select-budget-table', compact('tables'));
+}
+public function addImputationToForm(Request $request)
+{
+    $request->validate([
+        'imputation' => 'required|string',
+        'intitule' => 'nullable|string',
+    ]);
+
+    session()->put('selected_imputation', [
+    'imputation' => $request->imputation,
+    'intitule' => $request->intitule,
+    ]);
+
+
+    return redirect()->route('demande.add-demande');
+}
+public function chooseBudgetTableForEntry()
+{
+    $tables = BudgetTable::all();
+    return view('admin.demandes.choose-table-for-entry', compact('tables'));
+}
+
+public function showAddEntryForm($tableId)
+{
+    $budgetTable = BudgetTable::findOrFail($tableId);
+
+    return view('admin.demandes.add-entry-to-table', [
+        'budgetTable' => $budgetTable,
+    ]);
+}
+
+
+
+
+
+public function saveEntryAndReturn(Request $request)
+{
+    $request->validate([
+        'budget_table_id' => 'required|exists:budget_tables,id',
+        'imputation_comptable' => 'required|string',
+        'intitule' => 'required|string',
+        'prevision' => 'nullable|numeric',
+        'atterrissage' => 'nullable|numeric',
+    ]);
+
+    $budgetTable = BudgetTable::findOrFail($request->budget_table_id);
+
+    $lastPosition = BudgetEntry::where('budget_table_id', $budgetTable->id)->max('position') ?? 0;
+
+    $newEntry = BudgetEntry::create([
+        'budget_table_id' => $budgetTable->id,
+        'imputation_comptable' => $request->imputation_comptable,
+        'intitule' => $request->intitule,
+        'budget_previsionnel' => $request->prevision,
+        'atterrissage' => $request->atterrissage,
+        'position' => $lastPosition + 1,
+    ]);
+
+    session()->flash('selected_imputation', [
+        'imputation' => $newEntry->imputation_comptable,
+        'intitule' => $newEntry->intitule,
+    ]);
+
+    return redirect()->route('demande.add-demande')->with('success', 'Ligne ajoutée et sélectionnée.');
+}
+
 }

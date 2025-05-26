@@ -50,4 +50,9 @@ class Demande extends Model
         }
     
         return $durations;
-    }}
+    }
+    public function budgetEntries()
+    {
+        return $this->belongsToMany(BudgetEntry::class, 'budget_entry_demande');
+    }
+}

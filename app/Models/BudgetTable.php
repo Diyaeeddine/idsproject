@@ -10,6 +10,6 @@ class BudgetTable extends Model
 
     public function entries()
     {
-        return $this->hasMany(BudgetEntry::class);
+        return $this->hasMany(BudgetEntry::class)->orderBy('position');
     }
 }

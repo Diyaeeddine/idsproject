@@ -97,6 +97,18 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
 
     Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');
+
+
+    Route::get('/demande/select-budget-table', [DemandeController::class, 'selectBudgetTable'])->name('demande.select-budget-table');
+    Route::post('/demande/add-imputation', [DemandeController::class, 'addImputationToForm'])->name('demande.add-imputation-to-form');
+
+    Route::get('/demande/choose-table-for-entry', [DemandeController::class, 'chooseBudgetTableForEntry'])->name('demande.choose-table-for-entry');
+    Route::get('/demande/add-entry-to-table/{id}', [DemandeController::class, 'showAddEntryForm'])->name('demande.add-entry-to-table');
+    Route::post('/demande/save-entry-and-return', [DemandeController::class, 'saveEntryAndReturn'])->name('demande.save-entry-and-return');
+    Route::post('/admin/demandes/save-entry-and-return', [DemandeController::class, 'saveEntryAndReturn'])->name('demande.save-entry-and-return');
+
+    Route::get('/admin/demandes/budget-table/{tableId}/add-entry', [DemandeController::class, 'showAddEntryForm'])->name('demande.add-entry-form');
+
 });
 
 
@@ -135,12 +147,15 @@ Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('dem
 });
 
 
-Route::prefix('admin')->middleware(['auth', 'verified','admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/budgetaires/create', [BudgetTableController::class, 'create'])->name('budget-tables.create');
     Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');
+    Route::post('/admin/budget-tables', [BudgetTableController::class, 'store'])->name('budget-tables.store');
     Route::get('/tables-budgetaires', [BudgetTableController::class, 'index'])->name('budget-tables.index');
     Route::get('/tables-budgetaires/{id}', [BudgetTableController::class, 'show'])->name('budget-tables.show');
+    // Route::get('/admin/tables-budgetaires/{id}/export', [BudgetTableController::class, 'export'])->name('budget-tables.export');
     Route::get('/admin/budget-tables/export/{id}', [BudgetTableController::class, 'exportPdf'])->name('budget-tables.export');
+
 });
 
 

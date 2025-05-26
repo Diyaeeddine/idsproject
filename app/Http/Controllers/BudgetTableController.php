@@ -78,16 +78,13 @@ class BudgetTableController extends Controller
         $table = BudgetTable::with('entries')->findOrFail($id);
         $url = url("/admin/tables-budgetaires/{$id}");
 
-        // Generate QR code
         $qrCode = base64_encode(
             QrCode::format('png')->size(100)->generate($url)
         );
 
-        // Slugify the title for the file name
-        $safeTitle = Str::slug($table->title);  // e.g. "Budget Année 2025" -> "budget-annee-2025"
+        $safeTitle = Str::slug($table->title);
         $filename = "{$safeTitle}_{$table->id}.pdf";
 
-        // Load the view and generate PDF
         $pdf = Pdf::loadView('admin.budgetaire.export-pdf', [
             'table' => $table,
             'qrCode' => $qrCode,

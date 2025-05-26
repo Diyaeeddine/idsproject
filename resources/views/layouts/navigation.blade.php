@@ -25,7 +25,7 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('demande.add-demande')"
-                    :active="request()->routeIs('demande.add-demande')">
+                    :active="request()->routeIs('demande.add-demande') || request()->routeIs('demande.select-budget-table') || request()->routeIs('demande.choose-table-for-entry')">
                         {{ __('Création demande') }}
                     </x-nav-link>
                 </div>
