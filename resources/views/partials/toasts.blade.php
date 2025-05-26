@@ -92,17 +92,13 @@ class ToastManager {
             return;
         }
 
-        // Set message
         messageElement.textContent = message;
         
-        // Show with animation
         toastElement.classList.remove('hidden');
         toastElement.classList.add('animate-slide-in-right');
         
-        // Add to active toasts
         this.activeToasts.add(type);
         
-        // Auto-hide after duration
         if (duration > 0) {
             setTimeout(() => {
                 this.hideToast(type);
@@ -114,10 +110,10 @@ class ToastManager {
         const toastElement = document.getElementById(`toast-${type}`);
         if (!toastElement) return;
 
-        // Add exit animation
+    
         toastElement.classList.add('animate-slide-out-right');
         
-        // Remove from DOM after animation
+      
         setTimeout(() => {
             toastElement.classList.add('hidden');
             toastElement.classList.remove('animate-slide-in-right', 'animate-slide-out-right');
@@ -132,10 +128,8 @@ class ToastManager {
     }
 }
 
-// Initialize toast manager
 const toastManager = new ToastManager();
 
-// Global function for easy access
 function showToast(type, message, duration = 5000) {
     toastManager.showToast(type, message, duration);
 }
@@ -146,7 +140,6 @@ function hideToast(type) {
 </script>
 
 <style>
-/* Animations personnalisées */
 @keyframes slide-in-right {
     from {
         transform: translateX(100%);
@@ -177,7 +170,6 @@ function hideToast(type) {
     animation: slide-out-right 0.3s ease-in forwards;
 }
 
-/* Responsive adjustments */
 @media (max-width: 640px) {
     #toast-container {
         left: 1rem;
@@ -190,18 +182,15 @@ function hideToast(type) {
     }
 }
 
-/* Hover effects */
 #toast-container > div:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Z-index pour être au-dessus des modals */
 #toast-container {
     z-index: 9999;
 }
 
-/* Progress bar pour les toasts avec durée */
 .toast-progress {
     position: absolute;
     bottom: 0;

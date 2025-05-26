@@ -1,6 +1,7 @@
 
 <x-app-layout>
     <x-slot name="header">
+        {{-- {{$user = Auth::user()}} --}}
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Mes Demandes') }}
@@ -14,7 +15,13 @@
     
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('success'))
+            <div class="success-alert bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
+                {{ session('success') }}
+            </div>
+            @endif
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                
                 <div class="p-6">
                     @if($mesdemandes->count() > 0)
                         <div class="overflow-x-auto">
@@ -48,8 +55,18 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 <div class="flex items-center">
-                                                    <span>{{ $demande->temps_ecoule ?? 'N/A' }}</span>
-                                                    
+                                                                                                    
+
+                                                    @if(!empty($demande->pivot->duree))
+                                                    {{ $demande->pivot->duree }}
+                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm hover:bg-emerald-100 transition-colors duration-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700/30 ml-2">
+                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                        Déjà rempli
+                                                     </span>
+                                                    @else
+                                                        {{ $demande->temps_ecoule ?? 'N/A' }}
                                                     @if(isset($demande->temps_ecoule_minutes))
                                                         @if ($demande->temps_ecoule_minutes > 60)
                                                             <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300 ml-2">
@@ -65,6 +82,8 @@
                                                             </span>
                                                         @endif
                                                     @endif
+                                                    @endif
+
                                                 </div>
                                             </td>
                                         
@@ -81,13 +100,14 @@
                                                         Voir
                                                     </a>
                                                     
-                                                    <a href="{{ route('user.demandes.showRemplir', $demande->id) }}" 
-                                                       class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors duration-150">
-                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                        </svg>
-                                                        Remplir
-                                                    </a>
+                                                    <a href="{{ route('user.demandes.showRemplir', ['id' => $demande->id]) }}?temps_ecoule={{ $demande->temps_ecoule }}"
+                                                        class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors duration-150">
+                                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                         </svg>
+                                                         Remplir
+                                                     </a>
+                                                     
                                                 </div>
                                             </td>
                                         </tr>
@@ -101,7 +121,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Aucune demande</h3>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Vous n'avez pas encore créé de demandes.</p>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Vous n'avez pas encore été affectée à une demande.</p>
                         </div>
                     @endif
                 </div>

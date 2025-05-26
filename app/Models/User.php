@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,7 +51,7 @@ class User extends Authenticatable
     ];
     public function demandes()
     {
-        return $this->belongsToMany(Demande::class, 'demande_user');
+        return $this->belongsToMany(Demande::class, 'demande_user')->withPivot('duree', 'is_filled');;
     }
 
 }

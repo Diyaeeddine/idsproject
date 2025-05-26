@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Enums\UserRole;
-use Illuminate\Support\Facades\Hash;  // Importer la classe Hash
-use Illuminate\Validation\Rules\Password;  // Importer la classe Password
-use Illuminate\Auth\Events\Registered;  // Importer la classe Registered
+use Illuminate\Support\Facades\Hash;  
+use Illuminate\Validation\Rules\Password;  
+use Illuminate\Auth\Events\Registered;  
 use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
@@ -190,6 +190,14 @@ public function index(Request $request)
         ->wherePivot('updated_at', '<=', now()->subMinute(60))
         ->get();
 
-    return view('user.dashboard', ['nouvellesDemandes' => $nouvellesDemandes,'demandesEnRetard' => $demandesEnRetard]);
+    return view('user.dashboard', [
+        'nouvellesDemandes' => $nouvellesDemandes,
+        'demandesEnRetard' => $demandesEnRetard,
+    ]);
+}
+public function remplirDemande(){
+    return '';
 }
 }
+    
+   

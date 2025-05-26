@@ -16,11 +16,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                @if (session('success'))
-                <div class="success-alert bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-300 p-4 mb-6 rounded-md">
-                    {{ session('success') }}
-                </div>
-                @endif
+
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{route('user.demandes.remplir',$demande->id)}}" method="POST">
                         @csrf
@@ -33,9 +29,6 @@
                                         </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Value
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Créé à
                                         </th>
                                     </tr>
                                 </thead>
@@ -53,9 +46,6 @@
                                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100"
                                             >
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $champ->created_at->format('d/m/Y H:i') }}
-                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -71,6 +61,8 @@
                                 Sauvegarder
                             </button>
                         </div>
+                        <input type="hidden" name="temps_ecoule" value="{{ request()->query('temps_ecoule') }}">
+
                         @endif
                     </form>
                 </div>

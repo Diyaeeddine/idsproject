@@ -116,7 +116,7 @@ public function demandePage($id = null)
     }
 
     $selectedDemande = $id
-        ? Demande::with('users')->find($id) // Charge aussi l'utilisateur pour la demande sélectionnée
+        ? Demande::with('users')->find($id)
         : $demandes->first();
 
     if (!$selectedDemande) {
@@ -176,19 +176,49 @@ public function showRemplir($id){
 
     return view('user.remplirDemande', compact('user', 'demande', 'champs'));
 }
-public function remplir(Request $request, $id){
+public function remplir(Request $request, $id)
+{
+    // dd($request->all()); 
+
     $user = Auth::user();
     $demande = Demande::findOrFail($id);
 
-    foreach ($request->input('values', []) as $champId => $value) {
+    $values = $request->input('values', []);
+
+    foreach ($values as $champId => $value) {
         $champ = ChampPersonnalise::find($champId);
-        if ($champ && $champ->demande_id == $demande->id && $champ->user_id == $user->id ) { 
+        if ($champ && $champ->demande_id == $demande->id && $champ->user_id == $user->id) {
             $champ->value = $value;
             $champ->save();
-            $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => true]);
         }
     }
-    return redirect()->back()->with('success','Champs mis à jour avec succès.');
+
+    $champs = ChampPersonnalise::where('demande_id', $id)
+                ->where('user_id', $user->id)
+                ->get();
+
+    $allFilled = $champs->every(function ($champ) {
+        return !is_null($champ->value) && trim($champ->value) !== '';
+    });
+
+    if ($allFilled) {
+        $temps_ecoule = $request->query('temps_ecoule') ?? $request->input('temps_ecoule');
+
+        if ($temps_ecoule) {
+           
+        $user->demandes()->updateExistingPivot($demande->id, ['duree' => $temps_ecoule]);
+
+            $demande->save();
+        }
+
+        $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => true]);
+    } else {
+
+        $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => false]);
+    }
+    return redirect()->route('user.demandes')->with('success', 'Sauvegarde avec succès.');
+
 
 }
+
 }
