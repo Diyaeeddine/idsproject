@@ -60,7 +60,11 @@
             </tr>
             <tr>
                 <th>Date de création</th>
-                <td>{{ $demande->created_at ? $demande->created_at->format('d/m/Y à H:i') : 'Non disponible' }}</td>
+                <td>
+                    {{ $demande->created_at
+                        ? $demande->created_at->setTimezone(config('app.timezone'))->format('d/m/Y à H:i')
+                        : 'Non disponible' }}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -81,8 +85,8 @@
             @forelse($usersDurations as $ud)
                 <tr>
                     <td>{{ $ud['user']->name }} {{ $ud['user']->prenom ?? '' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($ud['assigned_at'])->format('d/m/Y H:i') }}</td>
-                    <td>{{ \Carbon\Carbon::parse($ud['completed_at'])->format('d/m/Y H:i') }}</td>
+                    <td>{{ $ud['assigned_at']->format('d/m/Y H:i') }}</td>
+                    <td>{{ $ud['completed_at']->format('d/m/Y H:i') }}</td>
                     <td>{{ $ud['duration'] }}</td>
                 </tr>
             @empty

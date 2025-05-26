@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->boolean('is_filled')->default(false);
             $table->string('duree')->nullable(true);
+            $table->integer('sort')->autoIncreament();
+            $table->boolean('IsYourTurn')->default(false);           
             $table->foreign('demande_id')->references('id')->on('demandes')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['demande_id', 'user_id']);

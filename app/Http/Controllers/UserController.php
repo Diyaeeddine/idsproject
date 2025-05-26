@@ -76,6 +76,7 @@ public function index(Request $request)
     /**
      * Show the form for editing the specified resource.
      */
+
     public function edit(string $id)
     {
         $user=User::find($id);
@@ -85,6 +86,7 @@ public function index(Request $request)
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request, string $id)
 {   
     $request->validate([
@@ -101,10 +103,6 @@ public function index(Request $request)
     return redirect()->route('acce.index')->with('success', 'Utilisateur mis à jour avec succès.');
 }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
@@ -118,44 +116,53 @@ public function index(Request $request)
 
     }
     public function userDemandes()
-    {
-        $user = Auth::user();
-        $mesdemandes = $user->demandes()->paginate(10);
-        
-        foreach ($mesdemandes as $demande) {
-            $updated_at = $demande->updated_at;
-            $now = now();
+{
+    $user = Auth::user();
 
-            $diffInMinutes = round($updated_at->diffInMinutes($now));
+    $mesdemandes = $user->demandes()
+    ->where(function ($query) {
+        $query->where(function ($q) {
+            $q->where('demande_user.isyourturn', true)
+              ->orWhere('demande_user.is_filled', true);
+        });
+    })
+    ->paginate(10);
 
-            if ($diffInMinutes < 60) {
-                $demande->temps_ecoule = $diffInMinutes . ' min';
-                $demande->temps_ecoule_minutes = $diffInMinutes;
-            } elseif ($diffInMinutes < 1440) { 
-                $hours = floor($diffInMinutes / 60);
-                $minutes = $diffInMinutes % 60;
-                $demande->temps_ecoule = $hours . 'h ' . $minutes . 'min';
-                $demande->temps_ecoule_minutes = $diffInMinutes;
-            } else { 
-                $days = floor($diffInMinutes / 1440);
-                $hours = floor(($diffInMinutes % 1440) / 60);
-                $demande->temps_ecoule = $days . 'j ' . $hours . 'h';
-                $demande->temps_ecoule_minutes = $diffInMinutes;
-            }
+    foreach ($mesdemandes as $demande) {
+        $updated_at = $demande->updated_at;
+        $now = now();
+
+        $diffInMinutes = round($updated_at->diffInMinutes($now));
+
+        if ($diffInMinutes < 60) {
+            $demande->temps_ecoule = $diffInMinutes . ' min';
+            $demande->temps_ecoule_minutes = $diffInMinutes;
+        } elseif ($diffInMinutes < 1440) {
+            $hours = floor($diffInMinutes / 60);
+            $minutes = $diffInMinutes % 60;
+            $demande->temps_ecoule = $hours . 'h ' . $minutes . 'min';
+            $demande->temps_ecoule_minutes = $diffInMinutes;
+        } else {
+            $days = floor($diffInMinutes / 1440);
+            $hours = floor(($diffInMinutes % 1440) / 60);
+            $demande->temps_ecoule = $days . 'j ' . $hours . 'h';
+            $demande->temps_ecoule_minutes = $diffInMinutes;
         }
-        
-        $nouvellesDemandes = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '>', now()->subMinute(60))
-            ->get();
-             
-        $demandesEnRetard = $user->demandes()
-            ->wherePivot('is_filled', false)
-            ->wherePivot('updated_at', '<=', now()->subMinute(60))
-            ->get();
-             
-        return view('user.demandes', compact('mesdemandes', 'nouvellesDemandes', 'demandesEnRetard'));
     }
+
+    $nouvellesDemandes = $user->demandes()
+        ->wherePivot('is_filled', false)
+        ->wherePivot('updated_at', '>', now()->subMinutes(60))
+        ->get();
+
+    $demandesEnRetard = $user->demandes()
+        ->wherePivot('is_filled', false)
+        ->wherePivot('updated_at', '<=', now()->subMinutes(60))
+        ->get();
+
+    return view('user.demandes', compact('mesdemandes', 'nouvellesDemandes', 'demandesEnRetard'));
+}
+
 
     public function getAlerts()
     {
@@ -194,9 +201,6 @@ public function index(Request $request)
         'nouvellesDemandes' => $nouvellesDemandes,
         'demandesEnRetard' => $demandesEnRetard,
     ]);
-}
-public function remplirDemande(){
-    return '';
 }
 }
     

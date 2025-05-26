@@ -51,7 +51,8 @@ class User extends Authenticatable
     ];
     public function demandes()
     {
-        return $this->belongsToMany(Demande::class, 'demande_user')->withPivot('duree', 'is_filled');;
+        return $this->belongsToMany(Demande::class, 'demande_user')
+            ->withPivot('duree', 'is_filled', 'isyourturn', 'sort', 'created_at', 'updated_at');
     }
 
 }

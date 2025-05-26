@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ChampPersonnalise;
 use App\Models\User;
-
+use Carbon\Carbon;
 class Demande extends Model
 {
     use HasFactory;
@@ -24,40 +24,30 @@ class Demande extends Model
     }
 
 
-public function usersWithDurations()
-{
-    $users = $this->users()->orderByPivot('created_at')->get();
-
-    $durations = [];
-    $previousEnd = $this->created_at; // Date création demande
-
-    foreach ($users as $user) {
-        $completedAt = $user->pivot->updated_at ?? now();
-
-        // Calcul de la durée en secondes entre previousEnd et completedAt
-        $durationSeconds = $previousEnd->diffInSeconds($completedAt);
-
-        // Formater la durée selon la taille
-        if ($durationSeconds < 60) {
-            $duration = $durationSeconds . ' secondes';
-        } elseif ($durationSeconds < 3600) {
-            $minutes = floor($durationSeconds / 60);
-            $duration = $minutes . ' minutes';
-        } else {
-            $hours = floor($durationSeconds / 3600);
-            $duration = $hours . ' heures';
+    public function usersWithDurations()
+    {
+        // Récupération des users triés par date d'affectation pivot (created_at)
+        $users = $this->users()->orderByPivot('created_at')->get();
+    
+        $durations = [];
+    
+        foreach ($users as $user) {
+            // Conversion des dates au fuseau horaire configuré dans Laravel, avec gestion DST
+            $assignedAt = Carbon::parse($user->pivot->created_at)
+                ->timezone(config('app.timezone'));
+            $completedAt = Carbon::parse($user->pivot->updated_at)
+                ->timezone(config('app.timezone'));
+    
+            // Durée stockée dans le pivot (champ duree)
+            $duration = $user->pivot->duree;
+    
+            $durations[] = [
+                'user' => $user,
+                'duration' => $duration,
+                'assigned_at' => $assignedAt,
+                'completed_at' => $completedAt,
+            ];
         }
-
-        $durations[] = [
-            'user' => $user,
-            'duration' => $duration,
-            'assigned_at' => $user->pivot->created_at,
-            'completed_at' => $completedAt,
-        ];
-
-        $previousEnd = $completedAt;
-    }
-
-    return $durations;
-}
-}
+    
+        return $durations;
+    }}

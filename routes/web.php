@@ -31,7 +31,7 @@ Route::post('/user/login', [UserController::class, 'store'])->name('user.login.s
 | Dashboard utilisateurs
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified', 'user')->group(function () {
     Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
     Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
     // Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');

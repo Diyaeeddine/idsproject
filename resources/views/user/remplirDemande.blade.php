@@ -39,7 +39,7 @@
                                             {{ $champ->key }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <input 
+                                            <input  required
                                                 type="text" 
                                                 value="{{ $champ->value }}"
                                                 name="values[{{ $champ->id }}]"

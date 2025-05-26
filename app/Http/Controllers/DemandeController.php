@@ -14,25 +14,18 @@ class DemandeController extends Controller
     /**
      * Display a listing of the resource.
      */
+    
     public function index()
     {
         $demands = Demande::with('users')->latest()->get();
         return view('admin.demandes.show-demande', compact('demands'));
-    }
-    public function userDemandes()
-    {
-        $user = auth()->user();
-        $mesdemandes = $user->demandes()
-            ->withPivot('is_filled', 'updated_at')
-            ->paginate(10);
-    
-        return view('user.demandes', compact('mesdemandes'));
     }
     
 
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         $users = User::all();
@@ -42,6 +35,7 @@ class DemandeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
 public function store(Request $request)
 {
     $request->validate([
@@ -128,6 +122,8 @@ public function demandePage($id = null)
         'selectedDemande' => $selectedDemande,
     ]);
 }
+
+
 public function affecterChamps(Request $request, $demandeId) 
 {
     $request->validate([
@@ -138,33 +134,59 @@ public function affecterChamps(Request $request, $demandeId)
 
     $userId = $request->input('user_id');
     $selectedChampIds = $request->input('champs_selected', []);
+    $demande = Demande::findOrFail($demandeId);
 
-    $champsValides = DB::table('champ_personnalises')
+    $existing = DB::table('demande_user')
+        ->where('demande_id', $demandeId)
+        ->where('user_id', $userId)
+        ->first();
+
+    if ($existing) {
+        return redirect()->back()->with('error', 'Cet utilisateur est déjà affecté à cette demande.');
+    }
+
+    $lastSort = DB::table('demande_user')
+    ->where('demande_id', $demandeId)
+    ->max('sort');
+
+$nextSort = $lastSort ? $lastSort + 1 : 1;
+
+$demande->users()->attach($userId, [
+    'sort' => $nextSort,
+    'isyourturn' => ($nextSort === 1), // Fix casing to match DB field
+    'is_filled' => false,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
+
+
+    $champsValidesCount = DB::table('champ_personnalises')
         ->where('demande_id', $demandeId)
         ->whereIn('id', $selectedChampIds)
         ->count();
-        
-    if ($champsValides !== count($selectedChampIds)) {
+
+    if ($champsValidesCount !== count($selectedChampIds)) {
         return redirect()->back()->with('error', 'Certains champs ne correspondent pas à cette demande.');
     }
-    
+
     DB::table('champ_personnalises')
         ->whereIn('id', $selectedChampIds)
-        ->update(['user_id' => $userId, 'updated_at' => now()]);
-    
-    DB::table('demande_user')->updateOrInsert(
-        ['demande_id' => $demandeId, 'user_id' => $userId],
-        ['created_at' => now(), 'updated_at' => now()]
-    );
-    
-    DB::table('demandes')->where('id', $demandeId)->update(['updated_at' => now()]);
-    
+        ->update([
+            'user_id' => $userId,
+            'updated_at' => now()
+        ]);
+
+    $demande->updated_at = now();
+    $demande->save();
+
     $nombreChamps = count($selectedChampIds);
     $userName = DB::table('users')->find($userId)->name;
     $message = $nombreChamps === 1 ? "1 champ affecté à {$userName}" : "{$nombreChamps} champs affectés à {$userName}";
-    
+
     return redirect()->route('demandes.affecter', $demandeId)->with('success', $message);
 }
+
+
 public function showRemplir($id){
     $user = Auth::user(); 
 
@@ -178,11 +200,8 @@ public function showRemplir($id){
 }
 public function remplir(Request $request, $id)
 {
-    // dd($request->all()); 
-
     $user = Auth::user();
     $demande = Demande::findOrFail($id);
-
     $values = $request->input('values', []);
 
     foreach ($values as $champId => $value) {
@@ -194,31 +213,43 @@ public function remplir(Request $request, $id)
     }
 
     $champs = ChampPersonnalise::where('demande_id', $id)
-                ->where('user_id', $user->id)
-                ->get();
+        ->where('user_id', $user->id)
+        ->get();
 
-    $allFilled = $champs->every(function ($champ) {
-        return !is_null($champ->value) && trim($champ->value) !== '';
-    });
+    $allFilled = $champs->every(fn($champ) => !is_null($champ->value) && trim($champ->value) !== '');
 
     if ($allFilled) {
         $temps_ecoule = $request->query('temps_ecoule') ?? $request->input('temps_ecoule');
 
         if ($temps_ecoule) {
-           
-        $user->demandes()->updateExistingPivot($demande->id, ['duree' => $temps_ecoule]);
-
-            $demande->save();
+            $user->demandes()->updateExistingPivot($demande->id, ['duree' => $temps_ecoule]);
         }
 
-        $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => true]);
-    } else {
+        $user->demandes()->updateExistingPivot($demande->id, [
+            'is_filled' => true,
+            'isyourturn' => false
+        ]);
 
+        $currentSort = DB::table('demande_user')
+            ->where('demande_id', $demande->id)
+            ->where('user_id', $user->id)
+            ->value('sort');
+
+        $nextUser = DB::table('demande_user')
+            ->where('demande_id', $demande->id)
+            ->where('sort', $currentSort + 1)
+            ->first();
+
+        if ($nextUser) {
+            DB::table('demande_user')
+                ->where('demande_id', $demande->id)
+                ->where('user_id', $nextUser->user_id)
+                ->update(['isyourturn' => true]);
+        }
+    } else {
         $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => false]);
     }
+
     return redirect()->route('user.demandes')->with('success', 'Sauvegarde avec succès.');
-
-
 }
-
 }
