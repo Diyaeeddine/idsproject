@@ -73,18 +73,23 @@ class DemandeController extends Controller
          return redirect()->back()->with('success', 'Demande créée avec succès');
      }
 
-public function show($id)
-{
-    $user = Auth::user(); 
-
-    $demande = Demande::findOrFail($id);
-
-    $champs = ChampPersonnalise::where('demande_id', $id)
-        ->where('user_id', $user->id)
-        ->get();
-
-    return view('user.voirDemande', compact('user', 'demande', 'champs'));
-}
+     public function show($id)
+     {
+         $user = Auth::user(); 
+         $demande = Demande::findOrFail($id);
+     
+         $champs = ChampPersonnalise::where('demande_id', $id)
+             ->where('user_id', $user->id)
+             ->get();
+     
+         $fichiers = DB::table('demande_files')
+             ->where('demande_id', $id)
+             ->where('user_id', $user->id)
+             ->orderBy('created_at', 'desc')
+             ->get();
+     
+         return view('user.voirDemande', compact('user', 'demande', 'champs', 'fichiers'));
+     }
 
 
     public function edit(Demande $demande)
@@ -211,17 +216,47 @@ public function showRemplir($id){
 
     return view('user.remplirDemande', compact('user', 'demande', 'champs'));
 }
-public function remplir(Request $request, $id)
-{
+public function remplir(Request $request, $id) {
     $user = Auth::user();
     $demande = Demande::findOrFail($id);
     $values = $request->input('values', []);
 
+    if ($request->hasFile('files')) {
+        $request->validate([
+            'files.*' => 'file|max:10240', // Max 10MB par fichier
+        ]);
+    }
+
+    // Traitement des champs personnalisés
     foreach ($values as $champId => $value) {
         $champ = ChampPersonnalise::find($champId);
         if ($champ && $champ->demande_id == $demande->id && $champ->user_id == $user->id) {
             $champ->value = $value;
             $champ->save();
+        }
+    }
+
+    // Gestion de l'upload des fichiers
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            $originalName = $file->getClientOriginalName();
+            $fileName = time() . '_' . $user->id . '_' . $originalName;
+            
+            // Stocker le fichier dans storage/app/public/demandes
+            $filePath = $file->storeAs('demandes', $fileName, 'public');
+            
+            // Sauvegarder les informations du fichier en base de données
+            // Option 1: Créer une table 'demande_files' ou 'fichiers'
+            DB::table('demande_files')->insert([
+                'demande_id' => $demande->id,
+                'user_id' => $user->id,
+                'file_name' => $originalName,
+                'file_path' => $filePath,
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 
@@ -263,7 +298,11 @@ public function remplir(Request $request, $id)
         $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => false]);
     }
 
-    return redirect()->route('user.demandes')->with('success', 'Sauvegarde avec succès.');
+    $message = $request->hasFile('files') ? 
+        'Sauvegarde avec succès. Fichiers uploadés.' : 
+        'Sauvegarde avec succès.';
+
+    return redirect()->route('user.demandes')->with('success', $message);
 }
 public function selectBudgetTable()
 {

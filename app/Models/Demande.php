@@ -20,37 +20,34 @@ class Demande extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'demande_user');
+        return $this->belongsToMany(User::class, 'demande_user')
+            ->withPivot('duree', 'created_at', 'updated_at'); // Champs pivot utilisés
     }
 
 
     public function usersWithDurations()
-    {
-        // Récupération des users triés par date d'affectation pivot (created_at)
-        $users = $this->users()->orderByPivot('created_at')->get();
-    
-        $durations = [];
-    
-        foreach ($users as $user) {
-            // Conversion des dates au fuseau horaire configuré dans Laravel, avec gestion DST
-            $assignedAt = Carbon::parse($user->pivot->created_at)
-                ->timezone(config('app.timezone'));
-            $completedAt = Carbon::parse($user->pivot->updated_at)
-                ->timezone(config('app.timezone'));
-    
-            // Durée stockée dans le pivot (champ duree)
-            $duration = $user->pivot->duree;
-    
-            $durations[] = [
-                'user' => $user,
-                'duration' => $duration,
-                'assigned_at' => $assignedAt,
-                'completed_at' => $completedAt,
-            ];
-        }
-    
-        return $durations;
+{
+    $users = $this->users()->orderByPivot('created_at')->get();
+
+    $durations = [];
+
+    foreach ($users as $user) {
+        $assignedAt = Carbon::parse($user->pivot->created_at)
+            ->timezone(config('app.timezone'));
+        $completedAt = Carbon::parse($user->pivot->updated_at)
+            ->timezone(config('app.timezone'));
+        $duration = $user->pivot->duree;
+
+        $durations[] = [
+            'user' => $user,
+            'duration' => $duration,
+            'assigned_at' => $assignedAt,
+            'completed_at' => $completedAt,
+        ];
     }
+
+    return $durations;
+}
     public function budgetEntries()
     {
         return $this->belongsToMany(BudgetEntry::class, 'budget_entry_demande');

@@ -18,7 +18,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
 
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{route('user.demandes.remplir',$demande->id)}}" method="POST">
+                    <form action="{{route('user.demandes.remplir',$demande->id)}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -39,7 +39,7 @@
                                             {{ $champ->key }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <input  required
+                                            <input required
                                                 type="text" 
                                                 value="{{ $champ->value }}"
                                                 name="values[{{ $champ->id }}]"
@@ -53,16 +53,33 @@
                         </div>
                         
                         @if($champs->count() > 0)
-                        <div class="mt-6 flex justify-end">
+                        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <div class="flex flex-col w-full sm:w-auto">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300" for="multiple_files">
+                                    Télécharger plusieurs fichiers
+                                </label>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                    Max 10MB par fichier
+                                </span>
+                                <div class="relative">
+                                    <input 
+                                        name="files[]"
+                                        class="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 file:cursor-pointer border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 hover:border-indigo-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200" 
+                                        id="multiple_files" 
+                                        type="file" 
+                                        multiple
+                                    >
+                                </div>
+                            </div> 
+                            
                             <button 
                                 type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200"
+                                class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-medium text-sm text-white shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 min-w-[120px] justify-center"
                             >
                                 Sauvegarder
                             </button>
                         </div>
                         <input type="hidden" name="temps_ecoule" value="{{ request()->query('temps_ecoule') }}">
-
                         @endif
                     </form>
                 </div>
