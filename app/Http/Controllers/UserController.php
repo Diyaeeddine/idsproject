@@ -202,6 +202,17 @@ public function index(Request $request)
         'demandesEnRetard' => $demandesEnRetard,
     ]);
 }
+public function notificationUser()
+{
+    $user = Auth::user();
+
+    $demandes = $user->demandes()->orderByDesc('pivot_updated_at')->take(5)->get()->map(function ($demande) {
+        $demande->temps = Carbon::parse($demande->pivot->updated_at)->diffForHumans();
+        return $demande;
+    });
+
+    return view('layouts.navigation', compact('demandes'));
+}
 }
     
    

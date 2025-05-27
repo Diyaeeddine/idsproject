@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BudgetTable;
 use App\Models\BudgetEntry;
+use App\Models\Notification;
 class DemandeController extends Controller
 {
     /**
@@ -47,6 +48,15 @@ class DemandeController extends Controller
              'titre' => $request->input('titre'),
              'user_id' => null,
          ]);
+                 // Création automatique de la notification pour la demande créée, sans utilisateur affecté
+        Notification::create([
+            'user_id' => null,  // Pas encore affectée à un utilisateur
+            'demande_id' => $demande->id,
+            'titre' => $demande->titre ?? 'Nouvelle demande',
+            'is_read' => false,
+            'read_at' => null,
+        ]);
+
      
          if (session()->has('selected_imputation')) {
          $imputation = session('selected_imputation');
@@ -196,6 +206,12 @@ $demande->users()->attach($userId, [
 
     $demande->updated_at = now();
     $demande->save();
+
+    $nombreChamps = count($selectedChampIds);
+    $userName = DB::table('users')->find($userId)->name;
+    $message = $nombreChamps === 1 ? "1 champ affecté à {$userName}" : "{$nombreChamps} champs affectés à {$userName}";
+    // Mise à jour de la notification pour lier à l'utilisateur affecté
+    Notification::where('demande_id', $demandeId)->update(['user_id' => $userId]);
 
     $nombreChamps = count($selectedChampIds);
     $userName = DB::table('users')->find($userId)->name;

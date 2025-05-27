@@ -54,5 +54,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Demande::class, 'demande_user')
             ->withPivot('duree', 'is_filled', 'isyourturn', 'sort', 'created_at', 'updated_at');
     }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 
 }

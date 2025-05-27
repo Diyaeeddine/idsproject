@@ -6,7 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BudgetTableController;
-
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +40,7 @@ Route::middleware('auth', 'verified', 'user')->group(function () {
     Route::post('user/demande/remplir/{id}', [DemandeController::class, 'remplir'])->name('user.demandes.remplir');
     // Route::get('/user/demandes/afficher/{id}', [UserController::class, 'show'])->name('user.demandes.voir');
 
+        Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
 });
 Route::get('user/dashboard', [UserController::class, 'userDashboard'])
     ->middleware(['auth', 'verified', 'user'])
@@ -75,29 +76,28 @@ Route::middleware('auth', 'verified', 'admin')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/demandes', [DemandeController::class, 'create'])
-    ->name('demandes');
+    Route::get('/demandes', [DemandeController::class, 'create'])
+        ->name('demandes');
 
-Route::get('admin/demandes', [DemandeController::class, 'index'])
-    ->name('admin.demandes');
+    Route::get('admin/demandes', [DemandeController::class, 'index'])
+        ->name('admin.demandes');
 
-Route::get('admin/demandes/add-demande', [DemandeController::class, 'create'])
-    ->name('demande.add-demande');
+    Route::get('admin/demandes/add-demande', [DemandeController::class, 'create'])
+        ->name('demande.add-demande');
 
-Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])
-    ->name('demande.store-demande');
+    Route::post('admin/demandes/add-demande', [DemandeController::class, 'store'])
+        ->name('demande.store-demande');
 
-Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])
-    ->name('demandes.affecter');
+    Route::get('/admin/demandes/affecter/{id?}', [DemandeController::class, 'affecterPage'])
+        ->name('demandes.affecter');
 
-Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUsers'])
+    Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterUsers'])
     ->name('demandes.affecterUsers');
     Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecterChamps'])
     ->name('demande.affecterChamps');
 
     Route::get('/admin/demandes/{id?}', [DemandeController::class, 'demandePage'])
     ->name('demande');
-
 
     Route::get('/demande/select-budget-table', [DemandeController::class, 'selectBudgetTable'])->name('demande.select-budget-table');
     Route::post('/demande/add-imputation', [DemandeController::class, 'addImputationToForm'])->name('demande.add-imputation-to-form');
@@ -110,7 +110,6 @@ Route::post('/admin/demandes/affecter/{id}', [DemandeController::class, 'affecte
     Route::get('/admin/demandes/budget-table/{tableId}/add-entry', [DemandeController::class, 'showAddEntryForm'])->name('demande.add-entry-form');
 
 });
-
 
 
 
@@ -142,12 +141,15 @@ Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
     ->name('acce.delete');
 
 Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
-
+    Route::get('demandes/{demande}/users/{user}/uploads', [PDFController::class, 'downloadPdf'])
+    ->name('admin.uploads.download');
+    Route::get('/admin/demandes/{demande}/user/{user}/uploads', [PDFController::class, 'showUserUploads'])
+    ->name('admin.demande.user.uploads');
+    Route::get('demandes/{demande}/user/{user}/fichiers/{fichier}/download', [PDFController::class, 'download'])
+    ->name('admin.download.file');
 
 });
-
-
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth','verified','admin'])->group(function () {
     Route::get('/budgetaires/create', [BudgetTableController::class, 'create'])->name('budget-tables.create');
     Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');
     Route::post('/admin/budget-tables', [BudgetTableController::class, 'store'])->name('budget-tables.store');
