@@ -1,6 +1,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"> 
 <script src="//unpkg.com/alpinejs" defer></script>
-
+<title>Création table Budgétaire </title>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-white">
@@ -22,28 +22,29 @@
                     @csrf
 
                     <div class="mb-4">
-                        <label for="title" class="block font-medium dark:text-white">Titre du Budget</label>
-                        <input type="text" name="title" id="title"
+                        
+                        <input type="text" name="title" id="title" placeholder="Titre du Budget"
                                class="w-full border rounded p-2 dark:bg-gray-800 dark:text-white" required>
                     </div>
 
                     <div class="mb-4">
-                        <label for="prevision" class="block font-medium dark:text-white">Prévisions Budgétaires (année)</label>
-                        <input type="number" name="prevision" id="prevision"
+                         
+                        <input type="number" name="prevision" id="prevision" placeholder="Prévisions Budgétaires (année)"
                                class="w-full border rounded p-2 dark:bg-gray-800 dark:text-white" required>
                     </div>
 
-                    <div class="flex justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between mb-4 gap-2">
                         <button type="button" onclick="addRow()"
                                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                             <i class="fas fa-plus"></i> Ajouter une ligne
                         </button>
                         <button type="button" onclick="addBlueTitleRow()"
-                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
                             <i class="fas fa-plus"></i> Ajouter un titre bleu
                         </button>
                     </div>
-
+                    
+                    <div class="overflow-x-auto">
                     <table class="min-w-full table-auto border mb-4">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-900">
@@ -51,15 +52,16 @@
                                 <th class="border px-4 py-2 dark:text-white">Intitulé</th>
                                 <th class="border px-4 py-2 dark:text-white">Budget Prévisionnel</th>
                                 <th class="border px-4 py-2 dark:text-white">Atterrissage</th>
-                                <th class="border px-4 py-2 text-center dark:text-white">Small Title</th>
-                                <th class="border px-4 py-2 text-center dark:text-white">Action</th>
+                                <th class="border px-4 py-2 text-center dark:text-white">grise Titre</th>
+                                <th class="border px-4 py-2 text-center dark:text-white">Supprimer</th>
                             </tr>
                         </thead>
                         <tbody id="rows"></tbody>
                     </table>
+                    </div>
 
                     <div class="text-right">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition duration-300">
                             Enregistrer
                         </button>
                     </div>

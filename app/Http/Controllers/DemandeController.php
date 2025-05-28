@@ -210,7 +210,6 @@ $demande->users()->attach($userId, [
     $nombreChamps = count($selectedChampIds);
     $userName = DB::table('users')->find($userId)->name;
     $message = $nombreChamps === 1 ? "1 champ affecté à {$userName}" : "{$nombreChamps} champs affectés à {$userName}";
-    // Mise à jour de la notification pour lier à l'utilisateur affecté
     Notification::where('demande_id', $demandeId)->update(['user_id' => $userId]);
 
     $nombreChamps = count($selectedChampIds);

@@ -149,7 +149,7 @@ Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('dem
     ->name('admin.download.file');
 
 });
-Route::prefix('admin')->middleware(['auth','verified','admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth','verified', 'admin'])->group(function () {
     Route::get('/budgetaires/create', [BudgetTableController::class, 'create'])->name('budget-tables.create');
     Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');
     Route::post('/admin/budget-tables', [BudgetTableController::class, 'store'])->name('budget-tables.store');
@@ -158,6 +158,9 @@ Route::prefix('admin')->middleware(['auth','verified','admin'])->group(function 
     // Route::get('/admin/tables-budgetaires/{id}/export', [BudgetTableController::class, 'export'])->name('budget-tables.export');
     Route::get('/admin/budget-tables/export/{id}', [BudgetTableController::class, 'exportPdf'])->name('budget-tables.export');
 
+    Route::get('/admin/budgetaire/tables-budgetaires', [BudgetTableController::class, 'index'])->name('budget-tables.index');
+    Route::get('/admin/budgetaire/tables-budgetaires/{id}/edit', [BudgetTableController::class, 'edit'])->name('budget-tables.edit');
+    Route::post('/admin/budgetaire/tables-budgetaires/{id}/update', [BudgetTableController::class, 'updateEntries'])->name('budget-tables.update.entries');
 });
 
 

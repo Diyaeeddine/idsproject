@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
+
+
 
 class BudgetTableController extends Controller
 {
@@ -92,5 +95,51 @@ class BudgetTableController extends Controller
         ]);
 
         return $pdf->download($filename);
+    }
+
+public function edit($id)
+    {
+        $budgetTable = BudgetTable::with('entries')->findOrFail($id);
+        return view('admin.budgetaire.edit-budget-table', compact('budgetTable'));
+    }
+
+    public function updateEntries(Request $request, $id)
+    {
+        $table = BudgetTable::findOrFail($id);
+        $table->update([
+            'title' => $request->title,
+            'prevision_label' => $request->prevision_label,
+        ]);
+
+        $existingIds = [];
+        $position = 1;
+
+        foreach ($request->entries as $key => $entryData) {
+            $data = [
+                'budget_table_id' => $id,
+                'imputation_comptable' => $entryData['imputation_comptable'] ?? null,
+                'intitule' => $entryData['intitule'] ?? null,
+                'budget_previsionnel' => $entryData['budget_previsionnel'] ?? null,
+                'atterrissage' => $entryData['atterrissage'] ?? null,
+                'b_title' => $entryData['b_title'] ?? null,
+                'is_header' => $entryData['is_header'] ?? 0,
+                'position' => $position++,
+            ];
+
+            if (str_starts_with($key, 'new_')) {
+                BudgetEntry::create($data);
+            } else {
+                $entry = BudgetEntry::find($entryData['id']);
+                if ($entry) {
+                    $entry->update($data);
+                    $existingIds[] = $entry->id;
+                }
+            }
+        }
+
+        // Delete removed entries
+        BudgetEntry::where('budget_table_id', $id)->whereNotIn('id', $existingIds)->delete();
+
+        return redirect()->route('budget-tables.index')->with('success', 'Table mise à jour avec succès.');
     }
 }
