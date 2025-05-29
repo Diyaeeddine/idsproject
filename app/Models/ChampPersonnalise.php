@@ -12,4 +12,9 @@ class ChampPersonnalise extends Model
     {
         return $this->belongsTo(Demande::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

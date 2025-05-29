@@ -1,3 +1,4 @@
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&display=swap" rel="stylesheet">
 @php
     use App\Enums\UserRole;
 @endphp
@@ -34,6 +35,23 @@
   transform-origin: top center;
   animation: ring 1.5s ease-in-out infinite;
 }
+
+.benbar-logo {
+        font-family: 'Unbounded', 'Segoe UI', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .benbar-logo {
+        color: #111111; 
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .benbar-logo {
+            color: #f2f2f2;
+        }
+    }
 </style>
 
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
@@ -41,11 +59,11 @@
     <div class="flex justify-between h-16">
       <div class="flex">
         <!-- Logo -->
-        <div class="shrink-0 flex items-center">
+        <div class="shrink-0 logo-wrapper mt-4">
           <a href="{{ route('dashboard') }}">
-            <h1 class="text-white border-solid border-white">IDS</h1>
+              <h1 class="benbar-logo">BenBar</h1>
           </a>
-        </div>
+      </div>
 
         <!-- Navigation Admin et User -->
         @if(Auth::user()->role === UserRole::Admin)

@@ -1,129 +1,160 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Figtree&display=swap" rel="stylesheet" />
+<style>
+    * {
+        font-family: 'Figtree', sans-serif;
+    }</style>
 <title>Accueil - Benbar</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Dashboard') }}
+                {{ __('Accueil') }}
             </h2>
         </div>
     </x-slot>
 
-    <!-- Animated Background Container -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <!-- Gradient Background -->
-        {{-- <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:bg-purple-900/20 transition-colors duration-500"></div> --}}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:bg-purple-950/20 transition-colors duration-500"></div>
-
-    </div>
-
-    <div class="relative z-10 py-10 px-4 sm:px-6 lg:px-8" id="dsq">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @php
-                $metrics = [
-                    [
-                        'label' => 'Total Demandes',
-                        'count' => \App\Models\Demande::count(),
-                        'color' => 'purple',
-                        'icon' => 'fa-file-invoice'
-                    ],
-                    [
-                        'label' => 'Budget Tables',
-                        'count' => \App\Models\BudgetTable::count(),
-                        'color' => 'blue',
-                        'icon' => 'fa-table'
-                    ],
-                    [
-                        'label' => 'Users',
-                        'count' => \App\Models\User::count(),
-                        'color' => 'green',
-                        'icon' => 'fa-users'
-                    ],
-                ];
-            @endphp
-
-            @foreach($metrics as $metric)
-                @php $color = $metric['color']; @endphp
-                <div class="metric-card group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-xl hover:shadow-2xl p-6 overflow-hidden transition-all duration-300 hover:scale-105">
-                    <!-- Card Glow Effect -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-{{ $color }}-500/10 to-{{ $color }}-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                    
-                    
-                    <!-- Icon -->
-                    <div class="flex items-center justify-between mb-4 relative z-10">
-                        <div class="p-3 bg-{{ $color }}-100 dark:bg-{{ $color }}-900/50 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas {{ $metric['icon'] }} text-{{ $color }}-600 dark:text-{{ $color }}-400 text-xl"></i>
-                        </div>
-                        <div class="text-{{ $color }}-500 opacity-20 text-6xl">
-                            <i class="fas {{ $metric['icon'] }}"></i>
-                        </div>
-                    </div>
-
-                    <h3 class="font-bold text-lg mb-2 relative z-10 text-gray-700 dark:text-gray-200">{{ $metric['label'] }}</h3>
-                    <p class="text-4xl font-extrabold relative z-10 text-{{ $color }}-600 dark:text-{{ $color }}-400 group-hover:text-{{ $color }}-500 transition-colors duration-300">{{ $metric['count'] }}</p>
-                    
-                    <!-- Progress Bar Animation -->
-                    <div class="absolute bottom-0 left-0 h-1 bg-{{ $color }}-500 rounded-b-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                </div>
-            @endforeach
-        </div>
-
-        <div class="mt-10">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 relative">
-                <span class="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Quick Access</span>
-                <div class="absolute -bottom-2 left-0 w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="py-6 px-4 sm:px-6 lg:px-8" id="dsq">
+        <!-- Metrics Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+                <i class="fas fa-chart-bar text-indigo-600 mr-2"></i>
+                Vue d'ensemble
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 @php
-                    $quickActions = [
-                        ['route' => 'demande.add-demande', 'icon' => 'fa-plus', 'label' => 'Add Demande', 'color' => 'purple'],
-                        ['route' => 'budget-tables.create', 'icon' => 'fa-square-plus', 'label' => 'Create Budget Table', 'color' => 'green'],
-                        ['route' => 'budget-tables.index', 'icon' => 'fa-table', 'label' => 'View Budget Tables', 'color' => 'yellow'],
-                        ['route' => 'admin.demandes', 'icon' => 'fa-list-check', 'label' => 'Manage Demandes', 'color' => 'pink'],
-                        ['route' => 'acce.index', 'icon' => 'fa-users', 'label' => 'Manage Users', 'color' => 'blue']
+                    $metrics = [
+                        [
+                            'label' => 'Total Demandes',
+                            'count' => \App\Models\Demande::count(),
+                            'color' => 'blue',
+                            'icon' => 'fa-file-alt'
+                        ],
+                        [
+                            'label' => 'Tables Budget',
+                            'count' => \App\Models\BudgetTable::count(),
+                            'color' => 'emerald',
+                            'icon' => 'fa-table'
+                        ],
+                        [
+                            'label' => 'Utilisateurs',
+                            'count' => \App\Models\User::count(),
+                            'color' => 'purple',
+                            'icon' => 'fa-users'
+                        ],
                     ];
                 @endphp
 
-                @foreach($quickActions as $action)
-                    <a href="{{ route($action['route']) }}"
-                       class="quick-action-card group relative block p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/30 dark:border-gray-700/30 rounded-2xl text-center hover:bg-{{ $action['color'] }}-50 dark:hover:bg-{{ $action['color'] }}-900/30 transition-all duration-300 hover:scale-105 hover:shadow-xl transform hover:-translate-y-1">
-                        
-                        <!-- Icon Container -->
-                        <div class="mx-auto w-16 h-16 bg-{{ $action['color'] }}-100 dark:bg-{{ $action['color'] }}-900/50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                            <i class="fas {{ $action['icon'] }} text-{{ $action['color'] }}-600 dark:text-{{ $action['color'] }}-400 text-2xl"></i>
+                @foreach($metrics as $metric)
+                    @php 
+                        $colorClasses = [
+                            'blue' => 'from-blue-500 to-blue-600',
+                            'emerald' => 'from-emerald-500 to-emerald-600', 
+                            'purple' => 'from-purple-500 to-purple-600'
+                        ];
+                        $gradientClass = $colorClasses[$metric['color']];
+                    @endphp
+                    <div class="metric-card bg-gradient-to-br {{ $gradientClass }} rounded-xl p-4 sm:p-5 text-white relative overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-white bg-opacity-10 rounded-full -mr-8 -mt-8"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-2">
+                                <i class="fas {{ $metric['icon'] }} text-xl sm:text-2xl opacity-80"></i>
+                                <span class="text-xl sm:text-2xl lg:text-3xl font-bold">{{ $metric['count'] }}</span>
+                            </div>
+                            <p class="text-xs sm:text-sm font-medium opacity-90">{{ $metric['label'] }}</p>
                         </div>
-                        
-                        <!-- Label -->
-                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-{{ $action['color'] }}-700 dark:group-hover:text-{{ $action['color'] }}-300 transition-colors duration-300">
-                            {{ $action['label'] }}
-                        </span>
-                        
-                        <!-- Hover Effect Line -->
-                        <div class="absolute bottom-0 left-1/2 w-0 h-1 bg-{{ $action['color'] }}-500 group-hover:w-full group-hover:left-0 transition-all duration-300 rounded-t-full"></div>
-                    </a>
+                    </div>
                 @endforeach
+            </div>
+        </div>
+
+        <!-- Quick Access Section -->
+        <div class="mt-8">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+                <i class="fas fa-bolt text-indigo-600 mr-2"></i>
+                Accès Rapide
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+                <a href="{{ route('demande.add-demande') }}"
+                   class="quick-access-card group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-center transition-all duration-200 hover:scale-105">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-plus text-green-600 dark:text-green-400 text-xl sm:text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1">Ajouter Demande</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Créer une nouvelle demande</p>
+                </a>
+
+                <a href="{{ route('budget-tables.create') }}"
+                   class="quick-access-card group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-center transition-all duration-200 hover:scale-105">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-square-plus text-blue-600 dark:text-blue-400 text-xl sm:text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1">Créer Budget</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Nouvelle table budget</p>
+                </a>
+
+                <a href="{{ route('budget-tables.store') }}"
+                   class="quick-access-card group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-center transition-all duration-200 hover:scale-105">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-table text-yellow-600 dark:text-yellow-400 text-xl sm:text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1">Voir Budgets</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Parcourir toutes les tables</p>
+                </a>
+
+                <a href="{{ route('admin.demandes') }}"
+                   class="quick-access-card group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-center transition-all duration-200 hover:scale-105">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-list-check text-red-600 dark:text-red-400 text-xl sm:text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1">Gérer Demandes</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Examiner et traiter</p>
+                </a>
+
+                <a href="{{ route('acce.index') }}"
+                   class="quick-access-card group bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-center transition-all duration-200 hover:scale-105">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-users text-purple-600 dark:text-purple-400 text-xl sm:text-2xl"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base mb-1">Gérer Utilisateurs</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Administration des utilisateurs</p>
+                </a>
             </div>
         </div>
     </div>
 
     <style>
-        * {
-            font-family: 'Figtree', sans-serif;
+        .metric-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Responsive adjustments */
+        
+        .metric-card:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quick-access-card {
+            transition: all 0.2s ease;
+        }
+        
+        .quick-access-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile optimizations */
         @media (max-width: 640px) {
-            .particles-container .particle {
-                display: none;
+            .metric-card {
+                padding: 1rem;
             }
             
-            .animate-float-slow,
-            .animate-float-delayed,
-            .animate-float-reverse {
-                animation-duration: 4s;
+            .quick-access-card {
+                padding: 1rem;
+            }
+            
+            .quick-access-card h4 {
+                font-size: 0.875rem;
             }
         }
     </style>
