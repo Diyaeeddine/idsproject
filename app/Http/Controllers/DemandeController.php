@@ -16,13 +16,13 @@ class DemandeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
+
     public function index()
     {
         $demands = Demande::with('users')->latest()->get();
         return view('admin.demandes.show-demande', compact('demands'));
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -43,7 +43,7 @@ class DemandeController extends Controller
          $request->validate([
              'titre' => 'required|string|max:255',
          ]);
-     
+
          $demande = Demande::create([
              'titre' => $request->input('titre'),
              'user_id' => null,
@@ -57,21 +57,21 @@ class DemandeController extends Controller
             'read_at' => null,
         ]);
 
-     
+
          if (session()->has('selected_imputation')) {
          $imputation = session('selected_imputation');
-     
+
          $entry = BudgetEntry::where('imputation_comptable', $imputation['imputation'])->first();
-     
+
          if ($entry) {
              $demande->budgetEntries()->attach($entry->id);
          } else {
              logger("BudgetEntry not found for imputation: " . $imputation['imputation']);
          }
      }
-     
+
          $fields = $request->input('fields', []);
-     
+
          foreach ($fields as $field) {
              ChampPersonnalise::create([
                  'key' => $field['key'],
@@ -79,25 +79,25 @@ class DemandeController extends Controller
                  'demande_id' => $demande->id,
              ]);
          }
-     
+
          return redirect()->back()->with('success', 'Demande créée avec succès');
      }
 
      public function show($id)
      {
-         $user = Auth::user(); 
+         $user = Auth::user();
          $demande = Demande::findOrFail($id);
-     
+
          $champs = ChampPersonnalise::where('demande_id', $id)
              ->where('user_id', $user->id)
              ->get();
-     
+
          $fichiers = DB::table('demande_files')
              ->where('demande_id', $id)
              ->where('user_id', $user->id)
              ->orderBy('created_at', 'desc')
              ->get();
-     
+
          return view('user.voirDemande', compact('user', 'demande', 'champs', 'fichiers'));
      }
 
@@ -120,7 +120,7 @@ class DemandeController extends Controller
 
     public function affecterPage($id = null)
     {
-        $demandes = Demande::with('champs')->latest()->get(); 
+        $demandes = Demande::with('champs')->latest()->get();
         $users = User::where('role','user')->get();
 
         $selectedDemande = $id ? Demande::with('champs')->findOrFail($id) : null;
@@ -152,7 +152,7 @@ public function demandePage($id = null)
 }
 
 
-public function affecterChamps(Request $request, $demandeId) 
+public function affecterChamps(Request $request, $demandeId)
 {
     $request->validate([
         'user_id' => 'required|exists:users,id',
@@ -174,20 +174,20 @@ public function affecterChamps(Request $request, $demandeId)
     }
 
     $lastSort = DB::table('demande_user')
-    ->where('demande_id', $demandeId)
-    ->max('sort');
+        ->where('demande_id', $demandeId)
+        ->max('sort');
 
-$nextSort = $lastSort ? $lastSort + 1 : 1;
+    $nextSort = $lastSort ? $lastSort + 1 : 1;
 
-$demande->users()->attach($userId, [
-    'sort' => $nextSort,
-    'isyourturn' => ($nextSort === 1), // Fix casing to match DB field
-    'is_filled' => false,
-    'created_at' => now(),
-    'updated_at' => now(),
-]);
+    $demande->users()->attach($userId, [
+        'sort' => $nextSort,
+        'IsYourTurn' => ($nextSort === 1),
+        'is_filled' => false,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
-
+    // Affecter les champs personnalisés
     $champsValidesCount = DB::table('champ_personnalises')
         ->where('demande_id', $demandeId)
         ->whereIn('id', $selectedChampIds)
@@ -207,11 +207,21 @@ $demande->users()->attach($userId, [
     $demande->updated_at = now();
     $demande->save();
 
-    $nombreChamps = count($selectedChampIds);
-    $userName = DB::table('users')->find($userId)->name;
-    $message = $nombreChamps === 1 ? "1 champ affecté à {$userName}" : "{$nombreChamps} champs affectés à {$userName}";
-    // Mise à jour de la notification pour lier à l'utilisateur affecté
-    Notification::where('demande_id', $demandeId)->update(['user_id' => $userId]);
+    // ✅ Créer une notification uniquement pour le premier utilisateur
+    if ($nextSort === 1) {
+        $notifExiste = Notification::where('user_id', $userId)
+            ->where('demande_id', $demandeId)
+            ->where('is_read', false)
+            ->exists();
+
+        if (!$notifExiste) {
+            Notification::create([
+                'user_id' => $userId,
+                'demande_id' => $demandeId,
+                'titre' => $demande->titre ?? 'Nouvelle demande',
+            ]);
+        }
+    }
 
     $nombreChamps = count($selectedChampIds);
     $userName = DB::table('users')->find($userId)->name;
@@ -221,8 +231,9 @@ $demande->users()->attach($userId, [
 }
 
 
+
 public function showRemplir($id){
-    $user = Auth::user(); 
+    $user = Auth::user();
 
     $demande = Demande::findOrFail($id);
 
@@ -239,7 +250,7 @@ public function remplir(Request $request, $id) {
 
     if ($request->hasFile('files')) {
         $request->validate([
-            'files.*' => 'file|max:10240', // Max 10MB par fichier
+            'files.*' => 'file|max:10240', // Max 10MB per file
         ]);
     }
 
@@ -257,12 +268,11 @@ public function remplir(Request $request, $id) {
         foreach ($request->file('files') as $file) {
             $originalName = $file->getClientOriginalName();
             $fileName = time() . '_' . $user->id . '_' . $originalName;
-            
+
             // Stocker le fichier dans storage/app/public/demandes
             $filePath = $file->storeAs('demandes', $fileName, 'public');
-            
+
             // Sauvegarder les informations du fichier en base de données
-            // Option 1: Créer une table 'demande_files' ou 'fichiers'
             DB::table('demande_files')->insert([
                 'demande_id' => $demande->id,
                 'user_id' => $user->id,
@@ -276,24 +286,27 @@ public function remplir(Request $request, $id) {
         }
     }
 
+    // Vérifier si tous les champs sont remplis
     $champs = ChampPersonnalise::where('demande_id', $id)
         ->where('user_id', $user->id)
         ->get();
 
     $allFilled = $champs->every(fn($champ) => !is_null($champ->value) && trim($champ->value) !== '');
 
+    // Si tous les champs sont remplis
     if ($allFilled) {
+        // Mettre à jour la table pivot avec la durée et marquer comme rempli
         $temps_ecoule = $request->query('temps_ecoule') ?? $request->input('temps_ecoule');
-
         if ($temps_ecoule) {
             $user->demandes()->updateExistingPivot($demande->id, ['duree' => $temps_ecoule]);
         }
 
         $user->demandes()->updateExistingPivot($demande->id, [
             'is_filled' => true,
-            'isyourturn' => false
+            'IsYourTurn' => false
         ]);
 
+        // Passer au prochain utilisateur (par ordre de 'sort')
         $currentSort = DB::table('demande_user')
             ->where('demande_id', $demande->id)
             ->where('user_id', $user->id)
@@ -308,18 +321,43 @@ public function remplir(Request $request, $id) {
             DB::table('demande_user')
                 ->where('demande_id', $demande->id)
                 ->where('user_id', $nextUser->user_id)
-                ->update(['isyourturn' => true]);
+                ->update(['IsYourTurn' => true]);
+        }
+
+        // Créer la notification pour le prochain utilisateur uniquement
+        if ($nextUser && !$this->isNotificationSent($nextUser->user_id, $demande->id)) {
+            $this->createNotification($nextUser->user_id, $demande);
         }
     } else {
         $user->demandes()->updateExistingPivot($demande->id, ['is_filled' => false]);
     }
 
-    $message = $request->hasFile('files') ? 
-        'Sauvegarde avec succès. Fichiers uploadés.' : 
+    $message = $request->hasFile('files') ?
+        'Sauvegarde avec succès. Fichiers uploadés.' :
         'Sauvegarde avec succès.';
 
     return redirect()->route('user.demandes')->with('success', $message);
 }
+
+private function isNotificationSent($userId, $demandeId)
+{
+    return Notification::where('user_id', $userId)
+        ->where('demande_id', $demandeId)
+        ->where('is_read', false)
+        ->exists();
+}
+
+private function createNotification($userId, $demande)
+{
+    Notification::create([
+        'user_id' => $userId,
+        'demande_id' => $demande->id,
+        'titre' => $demande->titre ?? 'Nouvelle demande',
+        'is_read' => false,
+        'read_at' => null,
+    ]);
+}
+
 public function selectBudgetTable()
 {
     $tables = BudgetTable::with('entries')->get();
@@ -389,5 +427,44 @@ public function saveEntryAndReturn(Request $request)
 
     return redirect()->route('demande.add-demande')->with('success', 'Ligne ajoutée et sélectionnée.');
 }
+public function completerEtPasserAuSuivant($demande_id)
+{
+    $user_id = Auth::id();
+
+    // Étape 1 : marquer l'utilisateur actuel comme terminé
+    DB::table('demande_user')
+        ->where('demande_id', $demande_id)
+        ->where('user_id', $user_id)
+        ->update([
+            'is_filled' => true,
+            'IsYourTurn' => false
+        ]);
+
+    // Étape 2 : trouver le suivant (par sort)
+    $suivant = DB::table('demande_user')
+        ->where('demande_id', $demande_id)
+        ->where('is_filled', false)
+        ->orderBy('sort')
+        ->first();
+
+    if ($suivant) {
+        // Étape 3 : activer son tour
+        DB::table('demande_user')
+            ->where('id', $suivant->id)
+            ->update(['IsYourTurn' => true]);
+
+        // Étape 4 : vérifier s'il a déjà une notification non lue
+        if (!$this->isNotificationSent($suivant->user_id, $demande_id)) {
+            $demande = Demande::find($demande_id);
+            $this->createNotification($suivant->user_id, $demande);
+        }
+    }
+
+    return response()->json(['success' => true]);
+}
+
+
+
+
 
 }

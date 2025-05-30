@@ -6,9 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\UserRole;
-use App\Models\Demande;
 use App\Models\Notification;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,8 +19,16 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             if (Auth::check() && Auth::user()->role === UserRole::User) {
-                $notifications = Notification::where('user_id', Auth::id())
+                $userId = Auth::id();
+
+                $notifications = Notification::where('user_id', $userId)
                     ->where('is_read', false)
+                    ->whereIn('demande_id', function ($query) use ($userId) {
+                        $query->select('demande_id')
+                              ->from('demande_user')
+                              ->where('user_id', $userId)
+                              ->where('IsYourTurn', true);
+                    })
                     ->orderBy('created_at', 'desc')
                     ->get()
                     ->map(function ($notif) {

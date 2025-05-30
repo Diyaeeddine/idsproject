@@ -64,25 +64,34 @@ public function markAsRead($id)
 
 
     // Générer notifications à partir des demandes non encore notifiées (à appeler à la connexion ou via cron)
-    public function generateNotifications()
-    {
-        $user = Auth::user();
+public function generateNotifications()
+{
+    $user = Auth::user();
 
-        // Par exemple : récupérer demandes non notifiées (pas encore en notifications)
-        $demandes = Demande::whereNotIn('id', function($query) use ($user) {
-            $query->select('demande_id')
-                  ->from('notifications')
-                  ->where('user_id', $user->id);
-        })->get();
+    // Récupérer les demandes où c'est son tour (IsYourTurn = true dans la table pivot)
+    $demandes = \DB::table('demande_user')
+        ->where('user_id', $user->id)
+        ->where('IsYourTurn', true)
+        ->get();
 
-        foreach ($demandes as $demande) {
+    foreach ($demandes as $pivot) {
+        // Vérifie si une notification a déjà été envoyée
+        $exists = Notification::where('user_id', $pivot->user_id)
+            ->where('demande_id', $pivot->demande_id)
+            ->where('is_read', false)
+            ->exists();
+
+        if (!$exists) {
+            $demande = Demande::find($pivot->demande_id);
             Notification::create([
-                'user_id' => $user->id,
-                'demande_id' => $demande->id,
+                'user_id' => $pivot->user_id,
+                'demande_id' => $pivot->demande_id,
                 'titre' => $demande->titre ?? 'Nouvelle demande',
             ]);
         }
-
-        return response()->json(['success' => true]);
     }
+
+    return response()->json(['success' => true]);
+}
+
 }
