@@ -34,13 +34,21 @@ Route::post('/user/login', [UserController::class, 'store'])->name('user.login.s
 Route::middleware('auth', 'verified', 'user')->group(function () {
     Route::get('/user/demandes', [UserController::class, 'userDemandes'])->name('user.demandes');
     Route::get('/user/alerts', [UserController::class, 'getAlerts'])->name('user.alerts');
-    // Route::post('/user/demandes/{demande}/remplir', [UserController::class, 'remplirDemande'])->name('user.demandes.remplir');
     Route::get('user/demande/afficher/{id}', [DemandeController::class, 'show'])->name('user.demandes.voir');
     Route::get('user/demande/remplir/{id}', [DemandeController::class, 'showRemplir'])->name('user.demandes.showRemplir');
     Route::post('user/demande/remplir/{id}', [DemandeController::class, 'remplir'])->name('user.demandes.remplir');
     // Route::get('/user/demandes/afficher/{id}', [UserController::class, 'show'])->name('user.demandes.voir');
 
         Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
+        Route::get('/telecharger/{filename}', function ($filename) {
+            $path = storage_path('app/public/demandes/' . $filename);
+        
+            if (!file_exists($path)) {
+                abort(404);
+            }
+        
+            return response()->download($path);
+        })->name('telecharger.fichier');
 });
 Route::get('user/dashboard', [UserController::class, 'userDashboard'])
     ->middleware(['auth', 'verified', 'user'])
@@ -143,12 +151,15 @@ Route::delete('profiles/delete/{id}', [UserController::class, 'destroy'])
 Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('demande.pdf');
     Route::get('demandes/{demande}/users/{user}/uploads', [PDFController::class, 'downloadPdf'])
     ->name('admin.uploads.download');
+
     Route::get('/admin/demandes/{demande}/user/{user}/uploads', [PDFController::class, 'showUserUploads'])
     ->name('admin.demande.user.uploads');
     Route::get('demandes/{demande}/user/{user}/fichiers/{fichier}/download', [PDFController::class, 'download'])
     ->name('admin.download.file');
 
+    Route::view('admin/contrats/contrat-radonnee', 'admin.contrats.contrat_randonnee')->name('admin.contrats.contrat_radonnee');
 });
+
 Route::prefix('admin')->middleware(['auth','verified', 'admin'])->group(function () {
     Route::get('/budgetaires/create', [BudgetTableController::class, 'create'])->name('budget-tables.create');
     Route::post('/budgetaires', [BudgetTableController::class, 'store'])->name('budget-tables.store');

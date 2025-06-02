@@ -175,8 +175,11 @@
                                                         @endif
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                                        {{ $champ->user->name }}
-                                                    </td>                                                    
+                                                        @if (!empty($champ->user->name))
+                                                            {{ $champ->user->name }}
+                                                        @endif
+                                                    </td>
+                                                                                                    
                                                 </tr>
                                             @endforeach
                                         </tbody>

@@ -46,6 +46,10 @@
     .benbar-logo {
         color: #111111; 
     }
+    .marina-logo{
+      max-width: 150px;
+      max-height: 50px;
+    }
 
     @media (prefers-color-scheme: dark) {
         .benbar-logo {
@@ -61,9 +65,9 @@
         <!-- Logo -->
         <div class="shrink-0 logo-wrapper mt-4">
           <a href="{{ route('dashboard') }}">
-              <h1 class="benbar-logo">BenBar</h1>
+            <img src="{{ asset('storage/images/logo-marina.png') }}" class="marina-logo"/>
           </a>
-      </div>
+        </div>
 
         <!-- Navigation Admin et User -->
         @if(Auth::user()->role === UserRole::Admin)
@@ -85,7 +89,7 @@
           <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
             <x-nav-link
               :href="route('admin.demandes')"
-              :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes') || request()->routeIs('demande')"
+              :active="request()->routeIs('demande.add-demand') || request()->routeIs('admin.demandes') || request()->routeIs('demande') || request()->routeIs('admin.demande.user.uploads')"
             >
               {{ __('Demandes') }}
             </x-nav-link>
