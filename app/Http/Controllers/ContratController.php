@@ -81,9 +81,7 @@
 
         // Gardien
         'nom_gardien' => 'nullable|string|max:255',
-        'cin_gardien' => 'nullable|string|max:50',
-        'tel_gardien' => 'nullable|string|max:20',
-        'passeport_gardien' => 'nullable|string|max:50',
+        'cin_pass_gardien' => 'nullable|string|max:50',
         'num_tele_gardien' => 'nullable|string|max:20',
 
         // Signature
