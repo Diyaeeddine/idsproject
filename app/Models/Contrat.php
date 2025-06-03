@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Demandeur;
+use App\Models\Proprietaire;
+use App\Models\Navire;
+use App\Models\Gardien;
+
+class Contrat extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'demandeur_id',
+        'proprietaire_id',
+        'navire_id',
+        'gardien_id',
+
+        'mouvements',
+        'majoration_stationnement',
+        'equipage',
+        'passagers',
+        'total_personnes',
+
+        'date_debut',
+        'date_fin',
+
+        'signe_par',
+        'date_signature',
+        'lieu_signature',
+        'accepte_par',
+    ];
+
+    public function demandeur()
+    {
+        return $this->belongsTo(Demandeur::class);
+    }
+
+    public function proprietaire()
+    {
+        return $this->belongsTo(Proprietaire::class);
+    }
+
+    public function navire()
+    {
+        return $this->belongsTo(Navire::class);
+    }
+
+    public function gardien()
+    {
+        return $this->belongsTo(Gardien::class);
+    }
+}

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BudgetTableController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ContratController;
 
 /*
 |--------------------------------------------------------------------------
@@ -156,8 +157,13 @@ Route::get('demande/{id}/pdf', [PDFController::class, 'generatePDF'])->name('dem
     ->name('admin.demande.user.uploads');
     Route::get('demandes/{demande}/user/{user}/fichiers/{fichier}/download', [PDFController::class, 'download'])
     ->name('admin.download.file');
+    Route::get('/contrats/create', [ContratController::class, 'create'])->name('contrats.create');
+    Route::post('/contrats', [ContratController::class, 'store'])->name('contrat.store');
+   
 
+    
     Route::view('admin/contrats/contrat-radonnee', 'admin.contrats.contrat_randonnee')->name('admin.contrats.contrat_radonnee');
+    Route::view('admin/contrats', 'admin.contrats.contrats')->name('admin.contrats');
 });
 
 Route::prefix('admin')->middleware(['auth','verified', 'admin'])->group(function () {

@@ -34,10 +34,8 @@
             display: inline-block;
             background: linear-gradient(135deg, #ffcc00, #ff6600, #0066cc);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 15px;
             margin-bottom: 10px;
         }
 
@@ -174,6 +172,10 @@
         .footer-line {
             margin-bottom: 5px;
         }
+        .marina-logo{
+      max-width: 200px;
+      max-height: 50px;
+    }
 
         .blue-text {
             color: #0066cc;
@@ -184,7 +186,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">Marina Bouregreg</div>
+            <div class="logo"><img src="{{ asset('storage/images/logo-marina.png') }}" class="marina-logo"/>
+            </div>
             <div class="title">Contrat d'usage de navire à titre commercial N°................................</div>
             <div class="subtitle">Commercial purpose ship contract</div>
         </div>
