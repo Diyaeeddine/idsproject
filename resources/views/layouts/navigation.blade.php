@@ -93,12 +93,6 @@
             >
               {{ __('Demandes') }}
             </x-nav-link>
-            <x-nav-link
-            :href="route('admin.contrats')"
-            :active="request()->routeIs('admin.contrats')"
-          >
-            {{ __('Contrats') }}
-          </x-nav-link>
           </div>
           <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
             <x-nav-link :href="route('budget-tables.create')" :active="request()->routeIs('budget-tables.create')">
@@ -127,6 +121,14 @@
             <x-nav-link :href="route('user.demandes')" :active="request()->routeIs('user.demandes') || request()->routeIs('user.demandes.showRemplir') || request()->routeIs('user.demandes.voir')">
               {{ __('Mes demandes') }}
             </x-nav-link>
+          </div>
+          <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link
+            :href="route('admin.contrats')"
+            :active="request()->routeIs('admin.contrats')"
+          >
+            {{ __('Contrats') }}
+          </x-nav-link>
           </div>
         @endif
       </div>

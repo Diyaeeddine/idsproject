@@ -9,15 +9,16 @@ class CreateContratsTable extends Migration
     {
         Schema::create('contrats', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('demandeur_id')->constrained('demandeurs')->onDelete('cascade');
             $table->foreignId('proprietaire_id')->nullable()->constrained('proprietaires')->nullOnDelete();
             $table->foreignId('navire_id')->nullable()->constrained('navires')->nullOnDelete();
             $table->foreignId('gardien_id')->nullable()->constrained('gardiens')->nullOnDelete();
             $table->text('mouvements')->nullable();
             $table->string('majoration_stationnement')->nullable();
-            $table->integer('equipage')->nullable();
-            $table->integer('passagers')->nullable();
-            $table->integer('total_personnes')->nullable();
+            // $table->integer('equipage')->nullable();
+            // $table->integer('passagers')->nullable();
+            // $table->integer('total_personnes')->nullable();
 
             $table->date('date_debut')->nullable();
             $table->date('date_fin')->nullable();
