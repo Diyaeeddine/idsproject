@@ -5,6 +5,11 @@
             {{ __('Créer un contrat') }}
         </h2>
     </x-slot>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-RXf+QSDCUQs6FSqoD5GkHa***"
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div><a href="{{route('user.contrats.contrat_radonnee')}}">CONTRAT contrat_radonnee</a></div>
 
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

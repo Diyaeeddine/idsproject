@@ -53,8 +53,11 @@ Route::middleware('auth', 'verified', 'user')->group(function () {
 
         Route::get('user/contrats/create', [ContratController::class, 'create'])->name('contrats.create');
         Route::post('user/contrats', [ContratController::class, 'store'])->name('contrat.store');   
-        Route::view('user/contrats/contrat-radonnee', 'admin.contrats.contrat_randonnee')->name('admin.contrats.contrat_radonnee');
-        Route::view('user/contrats', 'admin.contrats.contrats')->name('admin.contrats');
+        Route::view('user/contrats/contrat-radonnee', 'user.contrats.randonnee')->name('user.contrats.contrat_radonnee');
+        Route::view('user/contrats', 'user.contrats.contrats')->name('user.contrats');
+        Route::get('/contrats/generer/{id}/{type}', [ContratController::class, 'genererPDF'])->name('contrats.genererPDF');
+
+
 });
 Route::get('user/dashboard', [UserController::class, 'userDashboard'])
     ->middleware(['auth', 'verified', 'user'])

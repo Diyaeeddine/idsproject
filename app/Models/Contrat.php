@@ -8,6 +8,7 @@ use App\Models\Demandeur;
 use App\Models\Proprietaire;
 use App\Models\Navire;
 use App\Models\Gardien;
+use App\Models\User;
 
 class Contrat extends Model
 {
@@ -19,16 +20,14 @@ class Contrat extends Model
         'proprietaire_id',
         'navire_id',
         'gardien_id',
-
+        'type',
         'mouvements',
         'majoration_stationnement',
         'equipage',
         'passagers',
         'total_personnes',
-
         'date_debut',
         'date_fin',
-
         'signe_par',
         'date_signature',
         'lieu_signature',
@@ -43,6 +42,11 @@ class Contrat extends Model
     public function proprietaire()
     {
         return $this->belongsTo(Proprietaire::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function navire()

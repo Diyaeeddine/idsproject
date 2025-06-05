@@ -124,8 +124,8 @@
           </div>
           <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
             <x-nav-link
-            :href="route('admin.contrats')"
-            :active="request()->routeIs('admin.contrats')"
+            :href="route('user.contrats')"
+            :active="request()->routeIs('user.contrats') || request()->routeIs('contrats.create')"
           >
             {{ __('Contrats') }}
           </x-nav-link>
