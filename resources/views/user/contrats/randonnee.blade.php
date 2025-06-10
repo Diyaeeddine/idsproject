@@ -71,6 +71,7 @@
       margin-right: 5px;
     }
     .footer {
+      color:rgb(35, 32, 96);
       font-size: 11px;
       text-align: center;
       margin-top: 30px;
