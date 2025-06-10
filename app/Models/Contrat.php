@@ -30,10 +30,8 @@ class Contrat extends Model
         'date_fin',
         'signe_par',
         'date_signature',
-        'lieu_signature',
-        'accepte_par',
+        'accepte_le',
     ];
-
     public function demandeur()
     {
         return $this->belongsTo(Demandeur::class);

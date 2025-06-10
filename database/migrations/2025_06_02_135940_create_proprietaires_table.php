@@ -10,13 +10,14 @@ class CreateProprietairesTable extends Migration
     {
         Schema::create('proprietaires', function (Blueprint $table) {
             $table->id();
-            $table->string('type'); // physique ou morale
+            $table->string('type'); 
             $table->string('nom');
             $table->string('tel')->nullable();
             $table->string('nom_societe')->nullable();
             $table->string('ice')->nullable();
             $table->string('nationalite')->nullable();
-            $table->string('cin')->nullable();
+            $table->string('cin_pass_phy')->nullable();
+            $table->string('cin_pass_mor')->nullable();
             $table->date('validite_cin')->nullable();
             $table->string('caution_solidaire')->nullable();
             $table->string('passeport')->nullable();

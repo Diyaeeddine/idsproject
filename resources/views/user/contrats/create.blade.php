@@ -9,15 +9,25 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       integrity="sha512-RXf+QSDCUQs6FSqoD5GkHa***"
       crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <div><a href="{{route('user.contrats.contrat_radonnee')}}">CONTRAT contrat_radonnee</a></div>
-
+    <div>
+        <a href="{{ route('contrats.genererPDF', ['type' => 'randonnee', 'id' => 1]) }}">
+            CONTRAT contrat_randonnee (Test ID 1)
+        </a>
+        <a href="{{ route('contrats.genererPDF', ['type' => 'accostage', 'id' => 3]) }}">
+            CONTRAT contrat_Accostage (Test ID 1)
+        </a>
+        
+        
+    </div>
+ 
+    
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     <!-- Success Message -->
-                    <div id="success-message" class="hidden mb-6 p-4 bg-green-100 dark:bg-green-900/30 border-l-4 border-green-500 text-green-700 dark:text-green-400 rounded-r-lg">
+                    <div id="success-message" class="pr-6 hidden mb-6 p-4 bg-green-100 dark:bg-green-900/30 border-l-4 border-green-500 text-green-700 dark:text-green-400 rounded-r-lg">
                         <i class="fas fa-check-circle mr-2"></i>
                         Contrat créé avec succès !
                     </div>
@@ -25,11 +35,11 @@
                     <form class="space-y-8" action="{{ route('contrat.store') }}" method="POST">
                         @csrf
                         <!-- Type de contrat -->
-                        <div class="border-l-4 border-blue-500 pl-6 py-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-blue-500 pl-6 py-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center space-x-2">
                                 <i class="fa-solid fa-file-contract text-blue-500"></i>
                                 <span>Type de contrat</span>
-                            </h3>
+                            </h3><div>
                             <select name="type_contrat" id="type_contrat"
                                 class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-200"
                                 required onchange="typeContrat()">
@@ -38,9 +48,18 @@
                                 <option value="accostage">Contrat Accostage</option>
                             </select>
                         </div>
+                        <div class="randonnee-section mt-1 mb-1 hidden">
+                            <label for="num_titre_com">N° titre commercial</label>
+                            <input type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" name="num_titre_com" placeholder="N° titre commercial">
+                        </div>
+                        <div class="accostage-section mt-1 mb-1 hidden">
+                            <label for="num_abonn">N° d'Abonnement à l'Accostage</label>
+                            <input type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" name="num_abonn" placeholder="N° d'Abonnement à l'Accostage">
+                        </div>
+                        </div>
                         
                         <!-- Section Demandeur -->
-                        <div class="border-l-4 border-blue-500 pl-6 py-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-blue-500 pl-6 py-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-user text-blue-600 mr-3"></i>
                                 Informations du Demandeur
@@ -74,7 +93,7 @@
                         </div>
     
                         <!-- Section Propriétaire -->
-                        <div class="border-l-4 border-green-500 pl-6 py-4 bg-green-50/50 dark:bg-green-900/20 rounded-r-lg">
+                        <div class="border-l-4 border-green-500 pr-6 pl-6 py-4 bg-green-50/50 dark:bg-green-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-building text-green-600 mr-3"></i>
                                 Informations du Propriétaire
@@ -97,8 +116,8 @@
                                             <input id="nationalite_proprietaire" name="nationalite_proprietaire" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Nationalité" />
                                         </div>
                                         <div>
-                                            <label for="cin_pass_proprietaire" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">N° CIN (ou Passeport)</label>
-                                            <input id="cin_pass_proprietaire" name="cin_pass_proprietaire" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Numéro CIN" />
+                                            <label for="cin_pass_proprietaire_phy" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">N° CIN (ou Passeport)</label>
+                                            <input id="cin_pass_proprietaire_phy" name="cin_pass_proprietaire_phy" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Numéro CIN" />
                                         </div>
                                         <div>
                                             <label for="validite_cin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Validité jusqu'à</label>
@@ -123,8 +142,8 @@
                                             <input id="caution_solidaire" name="caution_solidaire" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Caution solidaire" />
                                         </div>
                                         <div>
-                                            <label for="cin_pass_proprietaire_morale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">N° CIN (ou Passeport)</label>
-                                            <input id="cin_pass_proprietaire_morale" name="cin_pass_proprietaire_morale" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Numéro de passeport" />
+                                            <label for="cin_pass_proprietaire_mor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">N° CIN (ou Passeport)</label>
+                                            <input id="cin_pass_proprietaire_mor" name="cin_pass_proprietaire_mor" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Numéro de passeport" />
                                         </div>
                                         <div>
                                             <label for="num_police" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">N° de Police</label>
@@ -151,7 +170,7 @@
                         </div>
     
                         <!-- Section Navire -->
-                        <div class="border-l-4 border-purple-500 pl-6 py-4 bg-purple-50/50 dark:bg-purple-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-purple-500 pl-6 py-4 bg-purple-50/50 dark:bg-purple-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-ship text-purple-600 mr-3"></i>
                                 Informations du Navire
@@ -214,7 +233,7 @@
                         </div>
     
                         <!-- Section Moteur -->
-                        <div class="border-l-4 border-orange-500 pl-6 py-4 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-orange-500 pl-6 py-4 bg-orange-50/50 dark:bg-orange-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-cog text-orange-600 mr-3"></i>
                                 Informations du Moteur
@@ -240,7 +259,7 @@
                         </div>
     
                         <!-- Section Autres prestations (Accostage) -->
-                        <div class="accostage-section hidden border-l-4 border-slate-600 dark:border-slate-400 pl-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 rounded-r-lg">
+                        <div class="accostage-section hidden pr-6 border-l-4 border-slate-600 dark:border-slate-400 pl-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fa-solid fa-check-double text-slate-600 dark:text-slate-400 mr-3"></i>
                                 Autres prestations
@@ -285,7 +304,7 @@
                         </div>
 
                         <!-- Section Mouvements (Randonnée) -->
-                        <div class="randonnee-section hidden border-l-4 border-teal-500 dark:border-teal-400 pl-6 py-4 bg-teal-50/50 dark:bg-teal-900/20 rounded-r-lg">
+                        <div class="randonnee-section hidden pr-6 border-l-4 border-teal-500 dark:border-teal-400 pl-6 py-4 bg-teal-50/50 dark:bg-teal-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-route text-teal-600 dark:text-teal-400 mr-3"></i>
                                 Mouvements et Tarification
@@ -330,7 +349,7 @@
                         </div>
 
                         <!-- Section Emplacement (Accostage) -->
-                        <div class="accostage-section hidden border-l-4 border-red-500 dark:border-red-400 pl-6 py-4 bg-red-50/50 dark:bg-red-900/20 rounded-r-lg">
+                        <div class="accostage-section hidden pr-6 border-l-4 border-red-500 dark:border-red-400 pl-6 py-4 bg-red-50/50 dark:bg-red-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fa-solid fa-location-dot text-red-600 dark:text-red-400 mr-3"></i>
                                 Emplacement
@@ -348,7 +367,7 @@
                         </div>
 
                         <!-- Section Équipage (Randonnée) -->
-                        <div class="randonnee-section hidden border-l-4 border-red-500 dark:border-red-400 pl-6 py-4 bg-red-50/50 dark:bg-red-900/20 rounded-r-lg">
+                        <div class="randonnee-section hidden pr-6 border-l-4 border-red-500 dark:border-red-400 pl-6 py-4 bg-red-50/50 dark:bg-red-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-users text-red-600 dark:text-red-400 mr-3"></i>
                                 Équipage et Passagers
@@ -370,7 +389,7 @@
                         </div>
 
                         <!-- Section Dates -->
-                        <div class="border-l-4 border-indigo-500 dark:border-indigo-400 pl-6 py-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-indigo-500 dark:border-indigo-400 pl-6 py-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-calendar-alt text-indigo-600 dark:text-indigo-400 mr-3"></i>
                                 Période facturé
@@ -388,7 +407,7 @@
                         </div>
 
                         <!-- Section Gardien -->
-                        <div class="border-l-4 border-yellow-500 dark:border-yellow-400 pl-6 py-4 bg-yellow-50/50 dark:bg-yellow-900/20 rounded-r-lg">
+                        <div class="border-l-4 pr-6 border-yellow-500 dark:border-yellow-400 pl-6 py-4 bg-yellow-50/50 dark:bg-yellow-900/20 rounded-r-lg">
                             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
                                 <i class="fas fa-shield-alt text-yellow-600 dark:text-yellow-400 mr-3"></i>
                                 Informations du Gardien
@@ -426,9 +445,7 @@
                                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Signé par</label>
                                         <select name="signe_par" class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-lg focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all duration-200">
                                             <option value="">Sélectionnez le signataire</option>
-                                            <option value="demandeur">Demandeur</option>
-                                            <option value="proprietaire">Propriétaire</option>
-                                            <option value="gardien">Gardien</option>
+                                            <option value="demandeur">M. Admin</option>
                                         </select>
                                     </div>
                                     <div>
@@ -438,7 +455,19 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Acceptation par -->
 
+                        <div class=" pr-6 border-l-4 border-green-600 dark:border-green-400 pl-6 py-4 bg-green-50/50 dark:bg-green-900/20 rounded-r-lg">
+                            <div class="space-y-4">
+                                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
+                                    <i class="fa-solid fa-check text-green-600 dark:text-green-400 mr-3"></i>
+                                    Acceptation
+                                </h3>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Accepté le</label>
+                            <input type="date" name="accepte_le" placeholder="Date d'acceptation" class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 rounded-lg focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all duration-200">    
+                        </div>         
+                      
+                    </div>
                         <!-- Boutons de soumission -->
                         <div class="mt-8 flex justify-end space-x-4">
                             <button type="button" class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
